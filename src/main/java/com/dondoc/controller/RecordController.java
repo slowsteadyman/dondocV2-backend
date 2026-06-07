@@ -1,15 +1,15 @@
 package com.dondoc.controller;
 
-import com.dondoc.dto.Categories;
-import com.dondoc.dto.MonthlyHistories;
-import com.dondoc.dto.Records;
+import com.dondoc.dto.*;
 import com.dondoc.service.RecordService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/api/record")
+@RequestMapping("/api/records")
 public class RecordController {
 
     private final RecordService recordService;
@@ -33,9 +33,19 @@ public class RecordController {
         return recordService.getMonthlyHistories();
     }
 
+//    @PostMapping
+//    public void createRecord(@RequestBody Records record){
+//        recordService.createRecord(record);
+//    }
+
     @PostMapping
-    public void createRecord(@RequestBody Records record){
-        recordService.createRecord(record);
+    public ResponseEntity<?> createRecord(@RequestHeader Long userId, @RequestBody RecordSaveRequest saveRequest){
+        RecordSaveResponse response = recordService.createRecord(userId, saveRequest);
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "data", response,
+                "message", "거래 추가 성공"
+        ));
     }
 
     @PostMapping("/categories")

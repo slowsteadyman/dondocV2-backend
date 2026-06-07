@@ -27,4 +27,14 @@ public class CategoryRepository {
         String sql = "INSERT INTO categories (name, icon, type) VALUES (?, ?, ?)";
         jdbcTemplate.update(sql, category.getName(), category.getIcon(), category.getType());
     }
+
+    public Category findById(Long id) {
+        String sql = "SELECT * FROM categories WHERE id = ?";
+        return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> new Category(
+                rs.getLong("id"),
+                rs.getString("name"),
+                rs.getString("icon"),
+                rs.getString("type")
+        ), id);
+    }
 }

@@ -1,8 +1,6 @@
 package com.dondoc.service;
 
-import com.dondoc.dto.Categories;
-import com.dondoc.dto.MonthlyHistories;
-import com.dondoc.dto.Records;
+import com.dondoc.dto.*;
 import com.dondoc.entity.Category;
 import com.dondoc.entity.MonthlyHistory;
 import com.dondoc.entity.Recorde;
@@ -67,6 +65,7 @@ public class RecordService {
                 .collect(Collectors.toList());
     }
 
+    // 사용하지 않을 수도 있다
     public void createRecord(Records dto){
         Recorde recorde = new Recorde(
                 null, dto.getUserId(), dto.getCategoryId(),
@@ -74,6 +73,22 @@ public class RecordService {
                 dto.getCreatedAt()
         );
         recordRepository.save(recorde);
+    }
+
+    public RecordSaveResponse createRecord(Long userId, RecordSaveRequest saveRequest) {
+        Long savedId = recordRepository.save(userId, saveRequest);
+        Recorde recorde = recordRepository.findById(savedId);
+        Category category = categoryRepository.findById(recorde.getCategoryId());
+
+        return new RecordSaveResponse(
+                recorde.getId(),
+                category.getType(),
+                new CategoryDto(category.getId(), category.getName()),
+                recorde.getRecordDate(),
+                recorde.getAmount(),
+                recorde.getDescription(),
+                recorde.getMemo()
+        );
     }
 
     public void createMonthlyHistory(MonthlyHistories dto){
