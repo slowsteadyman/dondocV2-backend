@@ -1,7 +1,9 @@
 package com.dondoc.controller;
 
+import com.dondoc.dto.ApiResponse;
 import com.dondoc.dto.Users;
 import com.dondoc.service.UserService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,5 +28,15 @@ public class UserController {
     @PostMapping
     public void createUser(@RequestBody Users user){
         userService.createUser(user);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getUserMe(
+            @RequestHeader(value = "userId", required = false) Long userId) {
+        if (userId == null) {
+            return ResponseEntity.status(401)
+                    .body(new ApiResponse<>(false, null, "인증 실패."));
+        }
+        return ResponseEntity.ok(userService.getUserMe(userId));
     }
 }
