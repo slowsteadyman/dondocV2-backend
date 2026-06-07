@@ -25,10 +25,20 @@ public class FarmRepository {
         ));
     }
 
+    //  - deleteByFarmIdAndUserId → farm_members에서 해당 유저 row 삭제
+    //  - countByFarmId → 탈퇴 후 남은 멤버 수 확인 (0이면 농장도 삭제해야 함)
     public void save(Farm farm) {
         String sql = "INSERT INTO farms (name, created_at) VALUES (?, ?)";
         jdbcTemplate.update(sql, farm.getName(), farm.getCreatedAt());
     }
 
-    public
+    public void deleteByFarmIdAndUserId(Long farmId, Long userId) {
+        String sql = "DELETE FROM farm_members WHERE farm_id = ? AND user_id = ?";
+        jdbcTemplate.update(sql, farmId, userId);
+    }
+
+    public int countByFarmId(Long farmId) {
+        String sql = "SELECT COUNT(*) FROM farm_members WHERE farm_id = ?";
+        return jdbcTemplate.queryForObject(sql, Integer.class, farmId);
+    }
 }
