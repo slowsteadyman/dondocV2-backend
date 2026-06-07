@@ -27,6 +27,7 @@ public class UserRepository {
                 rs.getInt("age"),
                 rs.getInt("current_pig_level"),
                 rs.getInt("current_house_level"),
+                rs.getInt("current_character_level"),
                 rs.getLong("monthly_income"),
                 rs.getInt("target_expense_ratio"),
                 rs.getObject("created_at", LocalDateTime.class)
@@ -34,7 +35,7 @@ public class UserRepository {
     }
 
     public void save(User user){
-        String sql = "INSERT INTO users (user_id, user_password, name, age, current_pig_level, current_house_level, monthly_income, target_expense_ratio, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO users (user_id, user_password, name, age, current_pig_level, current_house_level, current_character_level, monthly_income, target_expense_ratio, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         jdbcTemplate.update(sql,
                 user.getUserId(),
@@ -43,6 +44,7 @@ public class UserRepository {
                 user.getAge(),
                 user.getCurrentPigLevel(),
                 user.getCurrentHouseLevel(),
+                user.getCurrentCharacterLevel(),
                 user.getMonthlyIncome(),
                 user.getTargetExpenseRatio(),
                 user.getCreatedAt());
