@@ -1,6 +1,7 @@
 package com.dondoc.service;
 
 import com.dondoc.dto.FarmMembers;
+import com.dondoc.dto.FarmResponse;
 import com.dondoc.dto.Farms;
 import com.dondoc.entity.Farm;
 import com.dondoc.entity.FarmMember;
@@ -9,6 +10,7 @@ import com.dondoc.repository.FarmRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,5 +58,26 @@ public class FarmService {
         );
         farmMemberRepository.save(farmMember);
 
+    }
+
+    public List<FarmResponse> getFarmList(Long userId) {
+        List<Farm> farms = farmRepository.findAll();
+        Map<Long, Integer> memberCountMap = farmMemberRepository.findMemberCount();
+        List<Long> joinedFarms = farmMemberRepository.findJoinedFarmIdsByUserId(userId);
+
+
+        return farms.stream().map(farm -> {
+            FarmResponse farmResponse = new FarmResponse();
+
+            farmResponse.setFarmId(farm.getId());
+            farmResponse.setFarmName(farm.getName());
+            farmResponse.setCreatedAt(farm.getCreatedAt());
+
+            farmResponse.setMemberCount(memberCountMap.getOrDefault(farm.getId(), 0));
+
+            farmResponse.setJoined(joinedFarms.contains(farm.getId()));
+
+            return farmResponse;
+        }).collect(Collectors.toList());
     }
 }
