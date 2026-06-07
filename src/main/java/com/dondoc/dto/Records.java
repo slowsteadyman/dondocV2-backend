@@ -3,22 +3,17 @@ package com.dondoc.dto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class Records {
-    private Long id;
-    private Long userId;
-    private Long categoryId;
-    private Long amount;
-    private String description;
-    private String memo;
-    private LocalDate recordDate;
-    private LocalDateTime createdAt;
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DailySummaryResponse {
+        private LocalDate date;
+        private long income;
+        private long expense;
+        private int pigLevel;
+    }
 }
