@@ -3,12 +3,16 @@ package com.dondoc.service;
 import com.dondoc.dto.Categories;
 import com.dondoc.dto.MonthlyHistories;
 import com.dondoc.dto.Records;
+import com.dondoc.dto.Records.RecordUpdateRequest;
+import com.dondoc.dto.Records.RecordUpdateResponse;
 import com.dondoc.entity.Category;
 import com.dondoc.entity.MonthlyHistory;
 import com.dondoc.entity.Recorde;
 import com.dondoc.repository.CategoryRepository;
 import com.dondoc.repository.MonthlyHistoryRepository;
 import com.dondoc.repository.RecordRepository;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -92,4 +96,51 @@ public class RecordService {
         categoryRepository.save(category);
     }
 
+    public RecordUpdateResponse updateRecord(long id, RecordUpdateRequest dto) {
+        Recorde existing = recordRepository.findById(id);
+
+        Recorde recorde = new Recorde(
+            id,
+            existing.getUserId(),
+            dto.getCategoryId(),
+            dto.getAmount(),
+            dto.getDescription(),
+            dto.getMemo(),
+            LocalDate.parse(dto.getDate()),
+            existing.getCreatedAt()
+        );
+
+        int affectedRow = recordRepository.update(recorde);
+
+        if (affectedRow == 0) {
+            throw new RuntimeException("수정할 거래 정보 없음");
+        }
+
+        Recorde updated = recordRepository.findById(id);
+        Category category = categoryRepository.findById(updated.getCategoryId());
+
+        return new RecordUpdateResponse(
+            updated.getId(),
+            category.getType(),
+            updated.getRecordDate().toString(),
+            new Records.RecordUpdateResponse.CategoryInfo(
+                category.getId(),
+                category.getName()
+            ),
+            updated.getAmount(),
+            updated.getDescription(),
+            updated.getMemo()
+        );
+    }
+
+    /*public class Recorde {
+        private Long id;
+        private Long userId;
+        private Long categoryId;
+        private Long amount;
+        private String description;
+        private String memo;
+        private LocalDate recordDate;
+        private LocalDateTime createdAt;
+    }*/
 }

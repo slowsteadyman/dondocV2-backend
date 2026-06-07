@@ -21,4 +21,35 @@ public class Records {
     private String memo;
     private LocalDate recordDate;
     private LocalDateTime createdAt;
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RecordUpdateRequest {
+        private String type;
+        private long categoryId;
+        private String date;
+        private long amount;
+        private String description;
+        private String memo;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RecordUpdateResponse {
+        private long id;
+        private String type;
+        private String date;
+        private CategoryInfo category;
+        private long amount;
+        private String description;
+        private String memo;
+
+        @AllArgsConstructor
+        public static class CategoryInfo {
+            private long id;
+            private String name;
+        }
+    }
 }

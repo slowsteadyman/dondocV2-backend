@@ -1,15 +1,18 @@
 package com.dondoc.controller;
 
+import com.dondoc.dto.ApiResponse;
 import com.dondoc.dto.Categories;
 import com.dondoc.dto.MonthlyHistories;
 import com.dondoc.dto.Records;
+import com.dondoc.dto.Records.RecordUpdateRequest;
+import com.dondoc.dto.Records.RecordUpdateResponse;
 import com.dondoc.service.RecordService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/record")
+@RequestMapping("/api/records")
 public class RecordController {
 
     private final RecordService recordService;
@@ -46,5 +49,20 @@ public class RecordController {
     @PostMapping("/monthly-history")
     public void createMonthlyHistory(@RequestBody MonthlyHistories monthlyHistory){
         recordService.createMonthlyHistory(monthlyHistory);
+    }
+
+    @PatchMapping("/{id}")
+    public ApiResponse<RecordUpdateResponse> updateRecord(
+            @RequestHeader("userId") long userId,
+            @PathVariable long id,
+            @RequestBody RecordUpdateRequest dto
+    ) {
+        try {
+            RecordUpdateResponse data = recordService.updateRecord(id, dto);
+            String message = "거래 수정 성공";
+            return ApiResponse.ok(data, message);
+        } catch (RuntimeException e) {
+            return ApiResponse.fail(e.getMessage());
+        }
     }
 }
