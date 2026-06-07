@@ -1,5 +1,7 @@
 package com.dondoc.service;
 
+import com.dondoc.dto.ApiResponse;
+import com.dondoc.dto.FarmLeaveResponse;
 import com.dondoc.dto.FarmMembers;
 import com.dondoc.dto.Farms;
 import com.dondoc.entity.Farm;
@@ -57,4 +59,21 @@ public class FarmService {
         farmMemberRepository.save(farmMember);
 
     }
+
+    //  1. farm_members에서 해당 유저 삭제
+    //  2. 남은 멤버 수 확인
+    //  3. 0명이면 농장도 삭제
+    //  4. 응답 반환 (명세서에 message 없어서 null)
+    public ApiResponse<FarmLeaveResponse> leaveFarm(Long farmId, Long userId) {
+        farmMemberRepository.deleteByFarmIdAndUserId(farmId, userId);
+
+        int remainCount = farmMemberRepository.countByFarmId(farmId);
+        if (remainCount == 0) {
+            farmRepository.deleteById(farmId);
+        }
+
+        FarmLeaveResponse data = new FarmLeaveResponse(farmId, userId);
+        return new ApiResponse<>(true, data, null);
+    }
+
 }
