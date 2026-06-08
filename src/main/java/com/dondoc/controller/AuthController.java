@@ -3,6 +3,7 @@ package com.dondoc.controller;
 import com.dondoc.dto.auth.LoginRequest;
 import com.dondoc.dto.auth.LoginResponse;
 import com.dondoc.dto.auth.SignUpRequest;
+import com.dondoc.dto.auth.SignUpResponse;
 import com.dondoc.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,7 +44,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
                     "success", true,
                     "message", "회원가입이 완료되었습니다.",
-                    "data", Map.of("id", response)
+                    "data", new SignUpResponse(response)
             ));
         } else return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
                 "success", false,
