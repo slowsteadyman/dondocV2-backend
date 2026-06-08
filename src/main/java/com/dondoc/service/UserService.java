@@ -35,22 +35,20 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public void createUser(Users dto){
-        User user = new User(
-                null,
-                dto.getUserId(),
-                dto.getUserPassword(),
-                dto.getName(),
-                dto.getAge(),
-                dto.getCurrentPigLevel(),
-                dto.getCurrentHouseLevel(),
-                dto.getCurrentCharacterLevel(),
-                dto.getMonthlyIncome(),
-                dto.getTargetExpenseRatio(),
-                dto.getCreatedAt()
-        );
-        userRepository.save(user);
-    }
-
-
+//    public void createUser(Users dto){
+//        User user = new User(
+//                null,
+//                dto.getUserId(),
+//                dto.getUserPassword(),
+//                dto.getName(),
+//                dto.getAge(),
+//                dto.getCurrentPigLevel(),
+//                dto.getCurrentHouseLevel(),
+//                dto.getCurrentCharacterLevel(),
+//                dto.getMonthlyIncome(),
+//                dto.getTargetExpenseRatio(),
+//                dto.getCreatedAt()
+//        );
+//        userRepository.save(user);
+//    }
 }

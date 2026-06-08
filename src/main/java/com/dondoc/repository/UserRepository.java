@@ -1,13 +1,19 @@
 package com.dondoc.repository;
 
 
+import com.dondoc.dto.auth.SignUpRequest;
 import com.dondoc.entity.User;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Repository
@@ -36,20 +42,17 @@ public class UserRepository {
         ));
     }
 
-    public void save(User user){
-        String sql = "INSERT INTO users (user_id, user_password, name, age, current_pig_level, current_house_level, current_character_level, monthly_income, target_expense_ratio, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-        jdbcTemplate.update(sql,
-                user.getUserId(),
-                user.getUserPassword(),
-                user.getName(),
-                user.getAge(),
-                user.getCurrentPigLevel(),
-                user.getCurrentHouseLevel(),
-                user.getCurrentCharacterLevel(),
-                user.getMonthlyIncome(),
-                user.getTargetExpenseRatio(),
-                user.getCreatedAt());
+    public Long save(SignUpRequest user){
+        String sql = "INSERT INTO users (user_id, user_password, name, current_pig_level, current_house_level, current_character_level) VALUES (?, ?, ?, default, default, default)";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(con -> {
+            PreparedStatement pstmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            pstmt.setString(1, user.getUserId());
+            pstmt.setString(2, user.getUserPassword());
+            pstmt.setString(3, user.getName());
+            return pstmt;
+        }, keyHolder);
+        return Objects.requireNonNull(keyHolder.getKey()).longValue();
     }
 
     public Optional<User> findByUserId(String userId) {

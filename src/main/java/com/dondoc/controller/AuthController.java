@@ -2,6 +2,7 @@ package com.dondoc.controller;
 
 import com.dondoc.dto.auth.LoginRequest;
 import com.dondoc.dto.auth.LoginResponse;
+import com.dondoc.dto.auth.SignUpRequest;
 import com.dondoc.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +36,19 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(){
-        return ResponseEntity.ok(Map.of());
+    public ResponseEntity<?> signup(@RequestBody SignUpRequest request){
+        Long response = authService.createUser(request);
+
+        if(response > 0L) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
+                    "success", true,
+                    "message", "회원가입이 완료되었습니다.",
+                    "data", Map.of("id", response)
+            ));
+        } else return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
+                "success", false,
+                "message", "이미 사용 중인 아이디입니다.",
+                "data", new Object()
+        ));
     }
 }
