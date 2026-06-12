@@ -14,4 +14,12 @@ public class Categories {
     private String name;
     private String icon;
     private String type;
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CategoryDto {
+        Long id;
+        String name;
+    }
 }

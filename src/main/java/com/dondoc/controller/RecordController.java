@@ -1,12 +1,13 @@
 package com.dondoc.controller;
 
-import com.dondoc.dto.*;
+import com.dondoc.dto.ApiResponse;
+import com.dondoc.dto.Categories;
+import com.dondoc.dto.MonthlyHistories;
+import com.dondoc.dto.Records;
 import com.dondoc.service.RecordService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/records")
@@ -39,13 +40,8 @@ public class RecordController {
 //    }
 
     @PostMapping
-    public ResponseEntity<?> createRecord(@RequestHeader Long userId, @RequestBody RecordSaveRequest saveRequest){
-        RecordSaveResponse response = recordService.createRecord(userId, saveRequest);
-        return ResponseEntity.ok(Map.of(
-                "success", true,
-                "data", response,
-                "message", "거래 추가 성공"
-        ));
+    public ApiResponse<Records.RecordSaveResponse> createRecord(@RequestHeader Long userId, @RequestBody Records.RecordSaveRequest saveRequest){
+        return ApiResponse.ok(recordService.createRecord(userId, saveRequest),"거래 추가 성공");
     }
 
     @PostMapping("/categories")

@@ -1,13 +1,19 @@
 package com.dondoc.service;
 
-import com.dondoc.dto.*;
+import com.dondoc.dto.Categories;
+import com.dondoc.dto.MonthlyHistories;
+import com.dondoc.dto.Records;
 import com.dondoc.entity.Category;
 import com.dondoc.entity.MonthlyHistory;
 import com.dondoc.entity.Recorde;
+import com.dondoc.exception.ApiException;
 import com.dondoc.repository.CategoryRepository;
 import com.dondoc.repository.MonthlyHistoryRepository;
 import com.dondoc.repository.RecordRepository;
+import com.dondoc.repository.UserRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,11 +23,13 @@ public class RecordService {
     private final RecordRepository recordRepository;
     private final MonthlyHistoryRepository monthlyHistoryRepository;
     private final CategoryRepository categoryRepository;
+    private final UserRepository userRepository;
 
-    public RecordService(RecordRepository recordRepository, MonthlyHistoryRepository monthlyHistoryRepository, CategoryRepository categoryRepository){
+    public RecordService(RecordRepository recordRepository, MonthlyHistoryRepository monthlyHistoryRepository, CategoryRepository categoryRepository, UserRepository userRepository){
         this.recordRepository = recordRepository;
         this.monthlyHistoryRepository = monthlyHistoryRepository;
         this.categoryRepository = categoryRepository;
+        this.userRepository = userRepository;
     }
 
     public List<Records> getRecords(){
@@ -75,15 +83,19 @@ public class RecordService {
         recordRepository.save(recorde);
     }
 
-    public RecordSaveResponse createRecord(Long userId, RecordSaveRequest saveRequest) {
-        Long savedId = recordRepository.save(userId, saveRequest);
-        Recorde recorde = recordRepository.findById(savedId);
-        Category category = categoryRepository.findById(recorde.getCategoryId());
+    @Transactional
+    public Records.RecordSaveResponse createRecord(Long userId, Records.RecordSaveRequest saveRequest) {
+        // 정합성 검사
+        userRepository.findById(userId).orElseThrow(()->new ApiException(HttpStatus.CONFLICT, "존재하지 않는 사용자"));
 
-        return new RecordSaveResponse(
+        Long savedId = recordRepository.save(userId, saveRequest);
+        Recorde recorde = recordRepository.findById(savedId).orElseThrow(() -> new ApiException(HttpStatus.CONFLICT, "거래 추가 중 에러 발생"));
+        Category category = categoryRepository.findById(recorde.getCategoryId()).orElseThrow(() -> new ApiException(HttpStatus.CONFLICT, "카테고리 조회 중 오류 발생"));
+
+        return new Records.RecordSaveResponse(
                 recorde.getId(),
                 category.getType(),
-                new CategoryDto(category.getId(), category.getName()),
+                new Categories.CategoryDto(category.getId(), category.getName()),
                 recorde.getRecordDate(),
                 recorde.getAmount(),
                 recorde.getDescription(),

@@ -1,6 +1,6 @@
 package com.dondoc.repository;
 
-import com.dondoc.dto.RecordSaveRequest;
+import com.dondoc.dto.Records;
 import com.dondoc.entity.Recorde;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Repository
 public class RecordRepository {
@@ -44,7 +45,7 @@ public class RecordRepository {
         jdbcTemplate.update(sql, recorde.getUserId(), recorde.getCategoryId(), recorde.getAmount(), recorde.getDescription(), recorde.getMemo(), recorde.getRecordDate(), recorde.getCreatedAt());
     }
 
-    public Long save(Long userId, RecordSaveRequest saveRequest) {
+    public Long save(Long userId, Records.RecordSaveRequest saveRequest) {
         String sql = "INSERT INTO records (user_id, category_id, amount, description, memo, record_date) VALUES (?, ?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(con -> {
@@ -61,9 +62,9 @@ public class RecordRepository {
         return Objects.requireNonNull(keyHolder.getKey()).longValue();
     }
 
-    public Recorde findById(Long id) {
+    public Optional<Recorde> findById(Long id) {
         String sql = "SELECT * FROM records WHERE id = ?";
-        return jdbcTemplate.queryForObject(sql,(rs, rowNum) -> new Recorde(
+        return jdbcTemplate.query(sql,(rs, rowNum) -> new Recorde(
                 rs.getLong("id"),
                 rs.getLong("user_id"),
                 rs.getLong("category_id"),
@@ -72,6 +73,6 @@ public class RecordRepository {
                 rs.getString("memo"),
                 rs.getObject("record_date", LocalDate.class),
                 rs.getObject("created_at", LocalDateTime.class)
-        ), id);
+        ), id).stream().findFirst();
     }
 }
