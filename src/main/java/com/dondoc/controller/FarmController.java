@@ -1,14 +1,12 @@
 package com.dondoc.controller;
 
+import com.dondoc.dto.ApiResponse;
 import com.dondoc.dto.FarmMembers;
-import com.dondoc.dto.FarmResponse;
 import com.dondoc.dto.Farms;
 import com.dondoc.service.FarmService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/farms")
@@ -26,12 +24,8 @@ public class FarmController {
 //    }
 
     @GetMapping("")
-    public ResponseEntity<?> getFarmList(@RequestHeader("userId") Long userId) {
-        List<FarmResponse> responseList = farmService.getFarmList(userId);
-        return ResponseEntity.ok(Map.of(
-                "success", true,
-                "data", responseList
-        ));
+    public ApiResponse<List<Farms.FarmGetResponse>> getFarmList(@RequestHeader("userId") Long userId) {
+        return ApiResponse.ok(farmService.getFarmList(userId), "농장 목록 조회 성공");
     }
 
     @GetMapping("/members")
