@@ -1,6 +1,6 @@
 package com.dondoc.service;
 
-import com.dondoc.dto.Categories;
+import com.dondoc.dto.CategoryDto;
 import com.dondoc.dto.MonthlyHistories;
 import com.dondoc.dto.Records;
 import com.dondoc.entity.Category;
@@ -55,10 +55,10 @@ public class RecordService {
                 .collect(Collectors.toList());
     }
 
-    public List<Categories> getCategories(){
+    public List<CategoryDto.Category> getCategories(){
         List<Category> entities = categoryRepository.findAll();
         return entities.stream()
-                .map(entity -> new Categories(
+                .map(entity -> new CategoryDto.Category(
                         entity.getId(),
                         entity.getName(),
                         entity.getIcon(),
@@ -84,7 +84,7 @@ public class RecordService {
         monthlyHistoryRepository.save(monthlyHistory);
     }
 
-    public void createCategory(Categories dto){
+    public void createCategory(CategoryDto.Category dto){
         Category category = new Category(
                 null, dto.getName(), dto.getIcon(),
                 dto.getType()
