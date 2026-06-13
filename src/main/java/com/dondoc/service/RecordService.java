@@ -7,9 +7,11 @@ import com.dondoc.dto.Records.DailySummaryResponse;
 import com.dondoc.entity.Category;
 import com.dondoc.entity.MonthlyHistory;
 import com.dondoc.entity.Recorde;
+import com.dondoc.exception.ApiException;
 import com.dondoc.repository.CategoryRepository;
 import com.dondoc.repository.MonthlyHistoryRepository;
 import com.dondoc.repository.RecordRepository;
+import com.dondoc.repository.UserRepository;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
@@ -18,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,11 +28,13 @@ public class RecordService {
     private final RecordRepository recordRepository;
     private final MonthlyHistoryRepository monthlyHistoryRepository;
     private final CategoryRepository categoryRepository;
+    private final UserRepository userRepository;
 
-    public RecordService(RecordRepository recordRepository, MonthlyHistoryRepository monthlyHistoryRepository, CategoryRepository categoryRepository){
+    public RecordService(RecordRepository recordRepository, MonthlyHistoryRepository monthlyHistoryRepository, CategoryRepository categoryRepository, UserRepository userRepository){
         this.recordRepository = recordRepository;
         this.monthlyHistoryRepository = monthlyHistoryRepository;
         this.categoryRepository = categoryRepository;
+        this.userRepository = userRepository;
     }
 
     public List<MonthlyHistories> getMonthlyHistories(){
@@ -83,6 +88,9 @@ public class RecordService {
     }
 
     public List<DailySummaryResponse> getDailySummaries(long userId, YearMonth yearMonth) {
+        userRepository.findById(userId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "존재하지 않는 사용자입니다."));
+
         LocalDate start = yearMonth.atDay(1);
         LocalDate end = yearMonth.atEndOfMonth();
 

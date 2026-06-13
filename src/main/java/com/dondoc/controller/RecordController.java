@@ -8,6 +8,7 @@ import com.dondoc.dto.Records.DailySummaryResponse;
 import com.dondoc.service.RecordService;
 import java.time.Year;
 import java.time.YearMonth;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -53,13 +54,14 @@ public class RecordController {
     }
 
     @GetMapping("/summary/daily")
-    public ApiResponse<List<DailySummaryResponse>> getDailySummaries(
+    public ResponseEntity<ApiResponse<List<DailySummaryResponse>>> getDailySummaries(
             @RequestHeader("userId") long userId,
             @RequestParam String month) {
         YearMonth yearMonth = YearMonth.parse(month);
         List<DailySummaryResponse> data = recordService.getDailySummaries(userId, yearMonth);
         String message = "일별 통계 조회 성공";
 
-        return ApiResponse.ok(data, message);
+        return ResponseEntity.ok(ApiResponse.ok(data, message));
+
     }
 }
