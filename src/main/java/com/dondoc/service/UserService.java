@@ -3,7 +3,6 @@ package com.dondoc.service;
 import com.dondoc.dto.*;
 import com.dondoc.entity.User;
 import com.dondoc.exception.ApiException;
-import com.dondoc.repository.RecordRepository;
 import com.dondoc.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -15,20 +14,17 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
     private final UserRepository userRepository;
-    private final RecordRepository recordRepository;
 
-    public UserService(UserRepository userRepository, RecordRepository recordRepository){
+    public UserService(UserRepository userRepository){
         this.userRepository = userRepository;
-        this.recordRepository = recordRepository;
     }
 
-    public List<Users> getUsers(){
+    public List<UserDto.UserResponse> getUsers(){
         List<User> entities = userRepository.findAll();
         return entities.stream()
-                .map(entity -> new Users(
+                .map(entity -> new UserDto.UserResponse(
                         entity.getId(),
                         entity.getUserId(),
-                        entity.getUserPassword(),
                         entity.getName(),
                         entity.getAge(),
                         entity.getCurrentPigLevel(),
@@ -40,7 +36,7 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public void createUser(Users dto){
+    public void createUser(UserDto.CreateRequest dto){
         User user = new User(
                 null,
                 dto.getUserId(),
@@ -62,7 +58,7 @@ public class UserService {
 
     // dailyBudget = 월예산 / 이번달 일수  -> 하루에 쓸 수 있는 예산
     // LocalDate.now().lengthOfMonth() → 이번달이 며칠인지 자동으로 계산해줌
-    public UserMeResponse getUserMe(Long userId){
+    public UserDto.MeResponse getUserMe(Long userId){
         if (userId == null) {
             throw new ApiException(
                     HttpStatus.UNAUTHORIZED,
@@ -75,7 +71,7 @@ public class UserService {
         long monthlyBudget = user.getMonthlyIncome() * user.getTargetExpenseRatio() / 100;
         long dailyBudget = monthlyBudget / LocalDate.now().lengthOfMonth();
 
-        return new UserMeResponse(
+        return new UserDto.MeResponse(
                 user.getName(),
                 user.getAge(),
                 user.getCurrentPigLevel(),
@@ -90,21 +86,37 @@ public class UserService {
 
     }
 
-    public ApiResponse<UserPatchResponse> updateUserMe(Long userId, UserPatchRequest request){
-        userRepository.update(userId, request);
+    public ApiResponse<UserDto.PatchResponse> updateUserMe(Long userId, UserDto.PatchRequest request){
+        if (userId == null) {
+            throw new ApiException(
+                    HttpStatus.UNAUTHORIZED,
+                    "인증되지 않은 사용자입니다."
+            );
+        }
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
 
-        long monthlyBudget = user.getMonthlyIncome() * user.getTargetExpenseRatio() / 100;
+        userRepository.update(userId, request, user);
+
+        String updatedName = request.getName() != null ? request.getName() : user.getName();
+        Integer updatedAge = request.getAge() != null ? request.getAge() : user.getAge();
+        Long updatedMonthlyIncome = request.getMonthlyIncome() != null
+                ? request.getMonthlyIncome()
+                : user.getMonthlyIncome();
+        Integer updatedTargetExpenseRatio = request.getTargetExpenseRatio() != null
+                ? request.getTargetExpenseRatio()
+                : user.getTargetExpenseRatio();
+
+        long monthlyBudget = updatedMonthlyIncome * updatedTargetExpenseRatio / 100;
         long dailyBudget = monthlyBudget / LocalDate.now().lengthOfMonth();
 
-        UserPatchResponse data = new UserPatchResponse(
+        UserDto.PatchResponse data = new UserDto.PatchResponse(
                 user.getId(),
-                user.getName(),
-                user.getAge(),
-                user.getMonthlyIncome(),
-                user.getTargetExpenseRatio(),
+                updatedName,
+                updatedAge,
+                updatedMonthlyIncome,
+                updatedTargetExpenseRatio,
                 monthlyBudget,
                 dailyBudget
         );

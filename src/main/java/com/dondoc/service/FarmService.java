@@ -1,14 +1,15 @@
 package com.dondoc.service;
 
 import com.dondoc.dto.ApiResponse;
-import com.dondoc.dto.FarmLeaveResponse;
-import com.dondoc.dto.FarmMembers;
-import com.dondoc.dto.Farms;
+import com.dondoc.dto.FarmDto;
 import com.dondoc.entity.Farm;
 import com.dondoc.entity.FarmMember;
+import com.dondoc.exception.ApiException;
 import com.dondoc.repository.FarmMemberRepository;
 import com.dondoc.repository.FarmRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,10 +24,10 @@ public class FarmService {
         this.farmMemberRepository = farmMemberRepository;
     }
 
-    public List<Farms> getFarms(){
+    public List<FarmDto.Farm> getFarms(){
         List<Farm> entities = farmRepository.findAll();
         return entities.stream()
-                .map(entity -> new Farms(
+                .map(entity -> new FarmDto.Farm(
                         entity.getId(),
                         entity.getName(),
                         entity.getCreatedAt()
@@ -34,10 +35,10 @@ public class FarmService {
                 .collect(Collectors.toList());
     }
 
-    public List<FarmMembers> getFarmMembers(){
+    public List<FarmDto.Member> getFarmMembers(){
         List<FarmMember> entities = farmMemberRepository.findAll();
         return entities.stream()
-                .map(entity -> new FarmMembers(
+                .map(entity -> new FarmDto.Member(
                         entity.getId(),
                         entity.getUserId(),
                         entity.getFarmId(),
@@ -45,14 +46,14 @@ public class FarmService {
                 )).collect(Collectors.toList());
     }
 
-    public void createFarm(Farms dto){
+    public void createFarm(FarmDto.Farm dto){
         Farm farm = new Farm(
                 null, dto.getName(), dto.getCreatedAt()
         );
         farmRepository.save(farm);
     }
 
-    public void createFarmMember(FarmMembers dto){
+    public void createFarmMember(FarmDto.Member dto){
         FarmMember farmMember = new FarmMember(
                 null, dto.getUserId(), dto.getFarmId(), dto.getJoinedAt()
         );
@@ -64,15 +65,26 @@ public class FarmService {
     //  2. 남은 멤버 수 확인
     //  3. 0명이면 농장도 삭제
     //  4. 응답 반환 (명세서에 message 없어서 null)
-    public ApiResponse<FarmLeaveResponse> leaveFarm(Long farmId, Long userId) {
-        farmMemberRepository.deleteByFarmIdAndUserId(farmId, userId);
+    @Transactional
+    public ApiResponse<FarmDto.LeaveResponse> leaveFarm(Long farmId, Long userId) {
+        if (userId == null) {
+            throw new ApiException(
+                    HttpStatus.UNAUTHORIZED,
+                    "인증되지 않은 사용자입니다."
+            );
+        }
+
+        int deletedCount = farmMemberRepository.deleteByFarmIdAndUserId(farmId, userId);
+        if (deletedCount == 0) {
+            throw new ApiException(HttpStatus.NOT_FOUND, "농장 멤버를 찾을 수 없습니다.");
+        }
 
         int remainCount = farmMemberRepository.countByFarmId(farmId);
         if (remainCount == 0) {
             farmRepository.deleteById(farmId);
         }
 
-        FarmLeaveResponse data = new FarmLeaveResponse(farmId, userId);
+        FarmDto.LeaveResponse data = new FarmDto.LeaveResponse(farmId, userId);
         return new ApiResponse<>(true, data, null);
     }
 

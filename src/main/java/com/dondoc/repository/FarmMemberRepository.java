@@ -29,9 +29,9 @@ public class FarmMemberRepository {
         jdbcTemplate.update(sql, farmMember.getUserId(), farmMember.getFarmId(), farmMember.getJoinedAt());
     }
 
-    public void deleteByFarmIdAndUserId(Long farmId, Long userId) {
+    public int deleteByFarmIdAndUserId(Long farmId, Long userId) {
         String sql = "DELETE FROM farm_members WHERE farm_id = ? AND user_id = ?";
-        jdbcTemplate.update(sql, farmId, userId);
+        return jdbcTemplate.update(sql, farmId, userId);
     }
 
     public int countByFarmId(Long farmId) {

@@ -1,8 +1,6 @@
 package com.dondoc.controller;
 
-import com.dondoc.dto.ApiResponse;
-import com.dondoc.dto.FarmMembers;
-import com.dondoc.dto.Farms;
+import com.dondoc.dto.FarmDto;
 import com.dondoc.service.FarmService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,22 +18,22 @@ public class FarmController {
     }
 
     @GetMapping
-    public List<Farms> getFarms() {
+    public List<FarmDto.Farm> getFarms() {
         return farmService.getFarms();
     }
 
     @GetMapping("/members")
-    public List<FarmMembers> getFarmMembers() {
+    public List<FarmDto.Member> getFarmMembers() {
         return farmService.getFarmMembers();
     }
 
     @PostMapping
-    public void createFarm(@RequestBody Farms farm){
+    public void createFarm(@RequestBody FarmDto.Farm farm){
         farmService.createFarm(farm);
     }
 
     @PostMapping("/members")
-    public void createFarmMember(@RequestBody FarmMembers farmMember){
+    public void createFarmMember(@RequestBody FarmDto.Member farmMember){
         farmService.createFarmMember(farmMember);
     }
 
@@ -43,10 +41,6 @@ public class FarmController {
     public ResponseEntity<?> leaveFarm(
             @RequestHeader(value = "userId", required = false) Long userId,
             @PathVariable Long farmId) {
-        if (userId == null) {
-            return ResponseEntity.status(401)
-                    .body(new ApiResponse<>(false, null, "인증 토큰 없음"));
-        }
         return ResponseEntity.ok(farmService.leaveFarm(farmId, userId));
     }
 

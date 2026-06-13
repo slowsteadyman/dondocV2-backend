@@ -1,7 +1,7 @@
 package com.dondoc.repository;
 
 
-import com.dondoc.dto.UserPatchRequest;
+import com.dondoc.dto.UserDto;
 import com.dondoc.entity.User;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -58,19 +58,17 @@ public class UserRepository {
     }
 
     // 사용자 기본 설정
-    public void update(Long id, UserPatchRequest request) {
-        User user = findById(id).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
-
-                String sql = "UPDATE users SET name = ?, age = ?, monthly_income = ?, target_expense_ratio = ? WHERE id = ?";
-                jdbcTemplate.update(sql,
-                        request.getName() != null ? request.getName() : user.getName(),
-                        request.getAge() != null ? request.getAge() : user.getAge(),
-                        request.getMonthlyIncome() != null ? request.getMonthlyIncome() :
-                                user.getMonthlyIncome(),
-                        request.getTargetExpenseRatio() != null ? request.getTargetExpenseRatio() :
-                                user.getTargetExpenseRatio(),
-                        id
-                );
+    public void update(Long id, UserDto.PatchRequest request, User user) {
+        String sql = "UPDATE users SET name = ?, age = ?, monthly_income = ?, target_expense_ratio = ? WHERE id = ?";
+        jdbcTemplate.update(sql,
+                request.getName() != null ? request.getName() : user.getName(),
+                request.getAge() != null ? request.getAge() : user.getAge(),
+                request.getMonthlyIncome() != null ? request.getMonthlyIncome() : user.getMonthlyIncome(),
+                request.getTargetExpenseRatio() != null
+                        ? request.getTargetExpenseRatio()
+                        : user.getTargetExpenseRatio(),
+                id
+        );
     }
 
 
