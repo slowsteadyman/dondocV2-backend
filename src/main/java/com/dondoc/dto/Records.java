@@ -41,15 +41,9 @@ public class Records {
         private long id;
         private String type;
         private String date;
-        private CategoryInfo category;
+        private Categories.CategoryInfo category;
         private long amount;
         private String description;
         private String memo;
-
-        @AllArgsConstructor
-        public static class CategoryInfo {
-            private long id;
-            private String name;
-        }
     }
 }

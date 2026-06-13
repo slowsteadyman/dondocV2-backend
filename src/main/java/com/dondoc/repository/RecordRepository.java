@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class RecordRepository {
@@ -48,10 +49,9 @@ public class RecordRepository {
         );
     }
 
-    public Recorde findById(long id) {
+    public Optional<Recorde> findById(long id) {
         String sql = "SELECT * FROM records WHERE id = ?";
-
-        return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> new Recorde(
+        return jdbcTemplate.query(sql, (rs, rowNum) -> new Recorde(
             rs.getLong("id"),
             rs.getLong("user_id"),
             rs.getLong("category_id"),
@@ -60,6 +60,6 @@ public class RecordRepository {
             rs.getString("memo"),
             rs.getObject("record_date", LocalDate.class),
             rs.getObject("created_at", LocalDateTime.class)
-        ), id);
+        ), id).stream().findFirst();
     }
 }

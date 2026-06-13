@@ -8,11 +8,14 @@ import com.dondoc.dto.Records.RecordUpdateResponse;
 import com.dondoc.entity.Category;
 import com.dondoc.entity.MonthlyHistory;
 import com.dondoc.entity.Recorde;
+import com.dondoc.exception.ApiException;
 import com.dondoc.repository.CategoryRepository;
 import com.dondoc.repository.MonthlyHistoryRepository;
 import com.dondoc.repository.RecordRepository;
+import com.dondoc.repository.UserRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,11 +26,13 @@ public class RecordService {
     private final RecordRepository recordRepository;
     private final MonthlyHistoryRepository monthlyHistoryRepository;
     private final CategoryRepository categoryRepository;
+    private final UserRepository userRepository;
 
-    public RecordService(RecordRepository recordRepository, MonthlyHistoryRepository monthlyHistoryRepository, CategoryRepository categoryRepository){
+    public RecordService(RecordRepository recordRepository, MonthlyHistoryRepository monthlyHistoryRepository, CategoryRepository categoryRepository, UserRepository userRepository){
         this.recordRepository = recordRepository;
         this.monthlyHistoryRepository = monthlyHistoryRepository;
         this.categoryRepository = categoryRepository;
+        this.userRepository = userRepository;
     }
 
     public List<Records> getRecords(){
@@ -96,8 +101,16 @@ public class RecordService {
         categoryRepository.save(category);
     }
 
-    public RecordUpdateResponse updateRecord(long id, RecordUpdateRequest dto) {
-        Recorde existing = recordRepository.findById(id);
+    public RecordUpdateResponse updateRecord(long userId, long id, RecordUpdateRequest dto) {
+        userRepository.findById(userId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "존재하지 않는 사용자입니다."));
+
+        Recorde existing = recordRepository.findById(id)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "존재하지 않는 거래입니다."));
+
+        if (existing.getUserId() != userId) {
+            throw new ApiException(HttpStatus.FORBIDDEN, "본인의 거래만 수정할 수 있습니다.");
+        }
 
         Recorde recorde = new Recorde(
             id,
@@ -110,20 +123,17 @@ public class RecordService {
             existing.getCreatedAt()
         );
 
-        int affectedRow = recordRepository.update(recorde);
+        recordRepository.update(recorde);
 
-        if (affectedRow == 0) {
-            throw new RuntimeException("수정할 거래 정보 없음");
-        }
-
-        Recorde updated = recordRepository.findById(id);
+        Recorde updated = recordRepository.findById(id)
+                .orElseThrow(() -> new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "거래 수정 후 조회에 실패했습니다."));
         Category category = categoryRepository.findById(updated.getCategoryId());
 
         return new RecordUpdateResponse(
             updated.getId(),
             category.getType(),
             updated.getRecordDate().toString(),
-            new Records.RecordUpdateResponse.CategoryInfo(
+            new Categories.CategoryInfo(
                 category.getId(),
                 category.getName()
             ),

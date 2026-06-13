@@ -7,6 +7,7 @@ import com.dondoc.dto.Records;
 import com.dondoc.dto.Records.RecordUpdateRequest;
 import com.dondoc.dto.Records.RecordUpdateResponse;
 import com.dondoc.service.RecordService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -52,17 +53,12 @@ public class RecordController {
     }
 
     @PatchMapping("/{id}")
-    public ApiResponse<RecordUpdateResponse> updateRecord(
+    public ResponseEntity<ApiResponse<RecordUpdateResponse>> updateRecord(
             @RequestHeader("userId") long userId,
             @PathVariable long id,
-            @RequestBody RecordUpdateRequest dto
-    ) {
-        try {
-            RecordUpdateResponse data = recordService.updateRecord(id, dto);
-            String message = "거래 수정 성공";
-            return ApiResponse.ok(data, message);
-        } catch (RuntimeException e) {
-            return ApiResponse.fail(e.getMessage());
-        }
+            @RequestBody RecordUpdateRequest dto) {
+        RecordUpdateResponse data = recordService.updateRecord(userId, id, dto);
+        String message = "거래 수정 성공";
+        return ResponseEntity.ok(ApiResponse.ok(data, message));
     }
 }
