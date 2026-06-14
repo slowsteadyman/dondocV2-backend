@@ -16,6 +16,10 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.HashMap;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -35,6 +39,22 @@ public class RecordService {
         this.monthlyHistoryRepository = monthlyHistoryRepository;
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
+    }
+
+    public List<Records> getRecords(){
+        List<Recorde> entities = recordRepository.findAll();
+        return entities.stream()
+                .map(entity -> new Records(
+                        entity.getId(),
+                        entity.getUserId(),
+                        entity.getCategoryId(),
+                        entity.getAmount(),
+                        entity.getDescription(),
+                        entity.getMemo(),
+                        entity.getRecordDate(),
+                        entity.getCreatedAt()
+                ))
+                .collect(Collectors.toList());
     }
 
     public List<MonthlyHistories> getMonthlyHistories(){
@@ -62,16 +82,27 @@ public class RecordService {
                 .collect(Collectors.toList());
     }
 
-    /*public void createRecord(Records dto){
-        Recorde recorde = new Recorde(
-                null, dto.getUserId(), dto.getCategoryId(),
-                dto.getAmount(), dto.getDescription(), dto.getMemo(), dto.getRecordDate(),
-                dto.getCreatedAt()
-        );
-        recordRepository.save(recorde);
-    }*/
+    @Transactional
+    public Records.RecordSaveResponse createRecord(Long userId, Records.RecordSaveRequest saveRequest) {
+        // 정합성 검사
+        userRepository.findById(userId).orElseThrow(()->new ApiException(HttpStatus.CONFLICT, "존재하지 않는 사용자"));
 
-    public void createMonthlyHistory(MonthlyHistories dto){
+        Long savedId = recordRepository.save(userId, saveRequest);
+        Recorde recorde = recordRepository.findById(savedId).orElseThrow(() -> new ApiException(HttpStatus.CONFLICT, "거래 추가 중 에러 발생"));
+        Category category = categoryRepository.findById(recorde.getCategoryId()).orElseThrow(() -> new ApiException(HttpStatus.CONFLICT, "카테고리 조회 중 오류 발생"));
+
+        return new Records.RecordSaveResponse(
+                recorde.getId(),
+                category.getType(),
+                new Categories.CategoryDto(category.getId(), category.getName()),
+                recorde.getRecordDate(),
+                recorde.getAmount(),
+                recorde.getDescription(),
+                recorde.getMemo()
+        );
+    }
+
+    public void createMonthlyHistory(MonthlyHistories dto) {
         MonthlyHistory monthlyHistory = new MonthlyHistory(
                 null, dto.getUserId(), dto.getTargetMonth(),
                 dto.getAvgRatio(), dto.getHouseLevel()

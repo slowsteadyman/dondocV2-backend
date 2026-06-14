@@ -40,3 +40,8 @@ out/
 .claude
 CLAUDE.md
 src/main/resources/application.yaml
+#IDE 설정 무시
+.idea/
+
+# Android SDK 경로 등 민감한 정보
+local.properties

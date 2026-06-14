@@ -2,7 +2,6 @@ package com.dondoc.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.jspecify.annotations.Nullable;
 
 @Getter
 @AllArgsConstructor
