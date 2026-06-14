@@ -1,8 +1,8 @@
 package com.dondoc.service;
 
-import com.dondoc.dto.summary.MonthlySummaryResponse;
-import com.dondoc.dto.summary.SummaryCategory;
-import com.dondoc.dto.summary.SummaryDetail;
+import com.dondoc.dto.Records.MonthlySummaryResponse;
+import com.dondoc.dto.Records.SummaryCategory;
+import com.dondoc.dto.Records.SummaryDetail;
 import com.dondoc.entity.User;
 import com.dondoc.exception.ApiException;
 import com.dondoc.repository.RecordRepository;

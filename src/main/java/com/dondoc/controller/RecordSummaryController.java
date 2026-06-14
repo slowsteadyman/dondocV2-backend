@@ -1,7 +1,7 @@
 package com.dondoc.controller;
 
 import com.dondoc.dto.ApiResponse;
-import com.dondoc.dto.summary.MonthlySummaryResponse;
+import com.dondoc.dto.Records.MonthlySummaryResponse;
 import com.dondoc.service.RecordSummaryService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
