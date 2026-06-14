@@ -1,14 +1,13 @@
 package com.dondoc.service;
 
-import com.dondoc.dto.CreateFarmRequest;
-import com.dondoc.dto.CreateFarmResponse;
-import com.dondoc.dto.FarmMembers;
-import com.dondoc.dto.Farms;
+import com.dondoc.dto.FarmDto;
 import com.dondoc.entity.Farm;
 import com.dondoc.entity.FarmMember;
+import com.dondoc.exception.ApiException;
 import com.dondoc.repository.FarmMemberRepository;
 import com.dondoc.repository.FarmRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -25,10 +24,10 @@ public class FarmService {
         this.farmMemberRepository = farmMemberRepository;
     }
 
-    public List<Farms> getFarms(){
+    public List<FarmDto.Farm> getFarms(){
         List<Farm> entities = farmRepository.findAll();
         return entities.stream()
-                .map(entity -> new Farms(
+                .map(entity -> new FarmDto.Farm(
                         entity.getId(),
                         entity.getName(),
                         entity.getCreatedAt()
@@ -36,10 +35,10 @@ public class FarmService {
                 .collect(Collectors.toList());
     }
 
-    public List<FarmMembers> getFarmMembers(){
+    public List<FarmDto.Member> getFarmMembers(){
         List<FarmMember> entities = farmMemberRepository.findAll();
         return entities.stream()
-                .map(entity -> new FarmMembers(
+                .map(entity -> new FarmDto.Member(
                         entity.getId(),
                         entity.getUserId(),
                         entity.getFarmId(),
@@ -47,14 +46,14 @@ public class FarmService {
                 )).collect(Collectors.toList());
     }
 
-    public void createFarm(Farms dto){
+    public void createFarm(FarmDto.Farm dto){
         Farm farm = new Farm(
                 null, dto.getName(), dto.getCreatedAt()
         );
         farmRepository.save(farm);
     }
 
-    public void createFarmMember(FarmMembers dto){
+    public void createFarmMember(FarmDto.Member dto){
         FarmMember farmMember = new FarmMember(
                 null, dto.getUserId(), dto.getFarmId(), dto.getJoinedAt()
         );
@@ -63,19 +62,19 @@ public class FarmService {
     }
 
     @Transactional
-    public CreateFarmResponse createFarm(Long userId, CreateFarmRequest request) {
+    public FarmDto.CreateResponse createFarm(Long userId, FarmDto.CreateRequest request) {
         if (userId == null) {
-            throw new SecurityException("인증 토큰 없음");
+            throw new ApiException(HttpStatus.UNAUTHORIZED, "인증 토큰 없음");
         }
 
         if (request == null || request.getName() == null || request.getName().trim().isEmpty()) {
-            throw new IllegalArgumentException("농장 이름은 필수입니다");
+            throw new ApiException(HttpStatus.BAD_REQUEST, "농장 이름은 필수입니다");
         }
 
         String farmName = request.getName().trim();
 
         if (farmRepository.existsByName(farmName)) {
-            throw new IllegalStateException("중복된 농장 이름");
+            throw new ApiException(HttpStatus.CONFLICT, "중복된 농장 이름");
         }
 
         LocalDateTime createdAt = LocalDateTime.now();
@@ -85,6 +84,6 @@ public class FarmService {
         FarmMember farmMember = new FarmMember(null, userId, farmId, createdAt);
         farmMemberRepository.save(farmMember);
 
-        return new CreateFarmResponse(farmId, farmName, true, createdAt);
+        return new FarmDto.CreateResponse(farmId, farmName, true, createdAt);
     }
 }
