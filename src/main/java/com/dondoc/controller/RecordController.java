@@ -3,7 +3,7 @@ package com.dondoc.controller;
 import com.dondoc.dto.ApiResponse;
 import com.dondoc.dto.Categories;
 import com.dondoc.dto.MonthlyHistories;
-import com.dondoc.dto.RecordDto;
+import com.dondoc.dto.Records;
 import com.dondoc.service.RecordService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +21,7 @@ public class RecordController {
     }
 
     @GetMapping
-    public List<RecordDto.Record> getRecords() {
+    public List<Records.Record> getRecords() {
         return recordService.getRecords();
     }
 
@@ -36,7 +36,7 @@ public class RecordController {
     }
 
     @PostMapping
-    public void createRecord(@RequestBody RecordDto.Record record){
+    public void createRecord(@RequestBody Records.Record record){
         recordService.createRecord(record);
     }
 
@@ -51,11 +51,11 @@ public class RecordController {
     }
 
     @DeleteMapping("/{recordId}")
-    public ResponseEntity<ApiResponse<RecordDto.DeleteResponse>> deleteRecord(
+    public ResponseEntity<ApiResponse<Records.DeleteResponse>> deleteRecord(
             @RequestHeader(value = "userId", required = false) Long userId,
             @PathVariable Long recordId
     ) {
-        RecordDto.DeleteResponse response = recordService.deleteRecord(userId, recordId);
+        Records.DeleteResponse response = recordService.deleteRecord(userId, recordId);
         return ResponseEntity.ok(ApiResponse.ok(response, "거래 삭제 성공"));
     }
 }

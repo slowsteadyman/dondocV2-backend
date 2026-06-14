@@ -2,7 +2,7 @@ package com.dondoc.service;
 
 import com.dondoc.dto.Categories;
 import com.dondoc.dto.MonthlyHistories;
-import com.dondoc.dto.RecordDto;
+import com.dondoc.dto.Records;
 import com.dondoc.entity.Category;
 import com.dondoc.entity.MonthlyHistory;
 import com.dondoc.entity.Recorde;
@@ -28,10 +28,10 @@ public class RecordService {
         this.categoryRepository = categoryRepository;
     }
 
-    public List<RecordDto.Record> getRecords(){
+    public List<Records.Record> getRecords(){
         List<Recorde> entities = recordRepository.findAll();
         return entities.stream()
-                .map(entity -> new RecordDto.Record(
+                .map(entity -> new Records.Record(
                         entity.getId(),
                         entity.getUserId(),
                         entity.getCategoryId(),
@@ -69,7 +69,7 @@ public class RecordService {
                 .collect(Collectors.toList());
     }
 
-    public void createRecord(RecordDto.Record dto){
+    public void createRecord(Records.Record dto){
         Recorde recorde = new Recorde(
                 null, dto.getUserId(), dto.getCategoryId(),
                 dto.getAmount(), dto.getDescription(), dto.getMemo(), dto.getRecordDate(),
@@ -94,7 +94,7 @@ public class RecordService {
         categoryRepository.save(category);
     }
 
-    public RecordDto.DeleteResponse deleteRecord(Long userId, Long recordId) {
+    public Records.DeleteResponse deleteRecord(Long userId, Long recordId) {
         if (userId == null) {
             throw new ApiException(HttpStatus.UNAUTHORIZED, "인증 토큰 없음");
         }
@@ -107,7 +107,7 @@ public class RecordService {
         }
 
         recordRepository.deleteById(recordId);
-        return new RecordDto.DeleteResponse(recordId);
+        return new Records.DeleteResponse(recordId);
     }
 
 }
