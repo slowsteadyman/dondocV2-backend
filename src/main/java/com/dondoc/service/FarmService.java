@@ -9,8 +9,9 @@ import com.dondoc.exception.ApiException;
 import com.dondoc.repository.FarmMemberRepository;
 import com.dondoc.repository.FarmRepository;
 import com.dondoc.repository.UserRepository;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -29,10 +30,10 @@ public class FarmService {
         this.userRepository = userRepository;
     }
 
-    public List<Farms> getFarms(){
+    public List<Farms.Farm> getFarms(){
         List<Farm> entities = farmRepository.findAll();
         return entities.stream()
-                .map(entity -> new Farms(
+                .map(entity -> new Farms.Farm(
                         entity.getId(),
                         entity.getName(),
                         entity.getCreatedAt()
@@ -40,10 +41,10 @@ public class FarmService {
                 .collect(Collectors.toList());
     }
 
-    public List<FarmMembers> getFarmMembers(){
+    public List<Farms.Member> getFarmMembers(){
         List<FarmMember> entities = farmMemberRepository.findAll();
         return entities.stream()
-                .map(entity -> new FarmMembers(
+                .map(entity -> new Farms.Member(
                         entity.getId(),
                         entity.getUserId(),
                         entity.getFarmId(),
@@ -51,7 +52,7 @@ public class FarmService {
                 )).collect(Collectors.toList());
     }
 
-    public void createFarm(Farms dto){
+    public void createFarm(Farms.Farm dto){
         Farm farm = new Farm(
                 null, dto.getName(), dto.getCreatedAt()
         );
@@ -73,6 +74,14 @@ public class FarmService {
         return new FarmJoinResponse(userId, farmId, farmMember.getJoinedAt());
     }
 
+    public void createFarmMember(Farms.Member dto){
+        FarmMember farmMember = new FarmMember(
+            null, dto.getUserId(), dto.getFarmId(), dto.getJoinedAt()
+        );
+        farmMemberRepository.save(farmMember);
+
+    }
+
     public List<Farms.FarmGetResponse> getFarmList(Long userId) {
         // 정합성 검사
         userRepository.findById(userId).orElseThrow(()-> new ApiException(HttpStatus.UNAUTHORIZED, "존재하지 않는 사용자"));
@@ -91,5 +100,31 @@ public class FarmService {
                 joinedFarms.contains(farm.getId()),
                 farm.getCreatedAt())
         ).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public Farms.CreateResponse createFarm(Long userId, Farms.CreateRequest request) {
+        if (userId == null) {
+            throw new ApiException(HttpStatus.UNAUTHORIZED, "인증 토큰 없음");
+        }
+
+        if (request == null || request.getName() == null || request.getName().trim().isEmpty()) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "농장 이름은 필수입니다");
+        }
+
+        String farmName = request.getName().trim();
+
+        if (farmRepository.existsByName(farmName)) {
+            throw new ApiException(HttpStatus.CONFLICT, "중복된 농장 이름");
+        }
+
+        LocalDateTime createdAt = LocalDateTime.now();
+        Farm farm = new Farm(null, farmName, createdAt);
+        Long farmId = farmRepository.saveAndReturnId(farm);
+
+        FarmMember farmMember = new FarmMember(null, userId, farmId, createdAt);
+        farmMemberRepository.save(farmMember);
+
+        return new Farms.CreateResponse(farmId, farmName, true, createdAt);
     }
 }

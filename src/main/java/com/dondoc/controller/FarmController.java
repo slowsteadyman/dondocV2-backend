@@ -21,24 +21,24 @@ public class FarmController {
         this.farmService = farmService;
     }
 
-//    @GetMapping
-//    public List<Farms> getFarms() {
-//        return farmService.getFarms();
-//    }
-
     @GetMapping("")
     public ApiResponse<List<Farms.FarmGetResponse>> getFarmList(@RequestHeader("userId") Long userId) {
         return ApiResponse.ok(farmService.getFarmList(userId), "농장 목록 조회 성공");
     }
 
     @GetMapping("/members")
-    public List<FarmMembers> getFarmMembers() {
+    public List<Farms.Member> getFarmMembers() {
         return farmService.getFarmMembers();
     }
 
     @PostMapping
-    public void createFarm(@RequestBody Farms farm){
-        farmService.createFarm(farm);
+    public ResponseEntity<ApiResponse<Farms.CreateResponse>> createFarm(
+            @RequestHeader(value = "userId", required = false) Long userId,
+            @RequestBody Farms.CreateRequest request
+    ) {
+        Farms.CreateResponse response = farmService.createFarm(userId, request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.ok(response, "농장 생성 성공"));
     }
 
     @PostMapping("/{farmId}")
@@ -48,7 +48,12 @@ public class FarmController {
         FarmJoinResponse data = farmService.addFarmMember(userId, farmId);
         String message = "농장 가입 성공";
         return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(ApiResponse.ok(data, message));
+            .status(HttpStatus.CREATED)
+            .body(ApiResponse.ok(data, message));
+    }
+
+    @PostMapping("/members")
+    public void createFarmMember(@RequestBody Farms.Member farmMember){
+        farmService.createFarmMember(farmMember);
     }
 }

@@ -15,6 +15,16 @@ public class Farms {
     private LocalDateTime createdAt;
 
     @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Farm {
+        private Long id;
+        private String name;
+        private LocalDateTime createdAt;
+    }
+
+    @Getter
     @AllArgsConstructor
     public static class FarmDetailResponse {
         private final Long farmId;
@@ -32,8 +42,8 @@ public class Farms {
         private final Integer currentPigLevel;
         private final Integer currentHouseLevel;
         private final LocalDateTime joinedAt;
-    }  
- 
+    }
+
     @NoArgsConstructor
     @AllArgsConstructor
     public static class FarmGetResponse {
@@ -41,6 +51,33 @@ public class Farms {
         private String farmName;
         private Integer memberCount;
         private Boolean joined;
+        private LocalDateTime createdAt;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Member {
+        private Long id;
+        private Long userId;
+        private Long farmId;
+        private LocalDateTime joinedAt;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CreateRequest {
+        private String name;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class CreateResponse {
+        private Long farmId;
+        private String farmName;
+        private boolean joined;
         private LocalDateTime createdAt;
     }
 }
