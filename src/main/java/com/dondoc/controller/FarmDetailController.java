@@ -40,6 +40,6 @@ public class FarmDetailController {
             @Parameter(name = "userId", description = "사용자 ID", required = true, example = "1", in = ParameterIn.HEADER)
             @RequestHeader(value = "userId", required = false) String userId
     ) {
-        return ApiResponse.success(farmDetailService.getFarmDetail(userId, farmId));
+        return ApiResponse.ok(farmDetailService.getFarmDetail(userId, farmId), "농장 상세 조회 성공");
     }
 }
