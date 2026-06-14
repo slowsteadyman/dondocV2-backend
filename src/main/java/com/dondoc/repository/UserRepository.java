@@ -3,7 +3,6 @@ package com.dondoc.repository;
 
 import com.dondoc.dto.auth.SignUpRequest;
 import com.dondoc.entity.User;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -38,12 +37,13 @@ public class UserRepository {
                 rs.getInt("current_character_level"),
                 rs.getLong("monthly_income"),
                 rs.getInt("target_expense_ratio"),
-                rs.getObject("created_at", LocalDateTime.class)
+                rs.getObject("created_at", LocalDateTime.class),
+                rs.getObject("last_login_at", LocalDateTime.class)
         ));
     }
 
     public Long save(SignUpRequest user){
-        String sql = "INSERT INTO users (user_id, user_password, name, current_pig_level, current_house_level, current_character_level) VALUES (?, ?, ?, default, default, default)";
+        String sql = "INSERT INTO users (user_id, user_password, name, age, current_pig_level, current_house_level, current_character_level, monthly_income, target_expense_ratio ,last_login_at) VALUES (?, ?, ?, 0, default, default, default, 0, 0, null)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(con -> {
             PreparedStatement pstmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -57,8 +57,7 @@ public class UserRepository {
 
     public Optional<User> findByUserId(String userId) {
         String sql = "SELECT * FROM users WHERE user_id = ?";
-        try {
-            User user = jdbcTemplate.queryForObject(
+        List<User> users = jdbcTemplate.query(
                     sql, (rs, rowNum) -> new User(
                             rs.getLong("id"),
                             rs.getString("user_id"),
@@ -70,11 +69,34 @@ public class UserRepository {
                             rs.getInt("current_character_level"),
                             rs.getLong("monthly_income"),
                             rs.getInt("target_expense_ratio"),
-                            rs.getObject("created_at", LocalDateTime.class)
+                            rs.getObject("created_at", LocalDateTime.class),
+                            rs.getObject("last_login_at", LocalDateTime.class)
                     ), userId);
-            return Optional.of(user);
-        } catch (EmptyResultDataAccessException e) {
-            return Optional.empty();
-        }
+        return users.stream().findFirst();
+    }
+
+    public void updateLastLoginAt(Long id) {
+        String sql = "UPDATE users SET last_login_at = NOW() WHERE id = ?";
+        jdbcTemplate.update(sql, id);
+    }
+
+    // 현 API에서 사용하진 않지만 컬럼 추가 고려
+    public Optional<User> findById(Long id) {
+        String sql = "SELECT * FROM users WHERE id = ?";
+        List<User> users = jdbcTemplate.query(sql, (rs, rowNum) -> new User(
+                rs.getLong("id"),
+                rs.getString("user_id"),
+                rs.getString("user_password"),
+                rs.getString("name"),
+                rs.getInt("age"),
+                rs.getInt("current_pig_level"),
+                rs.getInt("current_house_level"),
+                rs.getInt("current_character_level"),
+                rs.getLong("monthly_income"),
+                rs.getInt("target_expense_ratio"),
+                rs.getObject("created_at", LocalDateTime.class),
+                rs.getObject("last_login_at", LocalDateTime.class)
+        ), id);
+        return users.stream().findFirst();
     }
 }

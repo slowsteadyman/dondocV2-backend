@@ -30,7 +30,8 @@ public class UserService {
                         entity.getCurrentCharacterLevel(),
                         entity.getMonthlyIncome(),
                         entity.getTargetExpenseRatio(),
-                        entity.getCreatedAt()
+                        entity.getCreatedAt(),
+                        entity.getLastLoginAt()
                 ))
                 .collect(Collectors.toList());
     }
