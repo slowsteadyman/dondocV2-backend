@@ -10,6 +10,7 @@ import com.dondoc.repository.UserRepository;
 import com.dondoc.repository.projection.FarmMemberDetail;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -31,6 +32,7 @@ public class FarmDetailService {
         this.userRepository = userRepository;
     }
 
+    @Transactional(readOnly = true)
     public FarmDetailResponse getFarmDetail(String userIdHeader, Long farmId) {
         Long userId = parseUserId(userIdHeader);
         Farm farm = farmRepository.findById(farmId)
