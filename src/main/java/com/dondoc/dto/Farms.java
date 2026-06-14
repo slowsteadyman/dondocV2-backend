@@ -1,9 +1,6 @@
 package com.dondoc.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,5 +32,15 @@ public class Farms {
         private final Integer currentPigLevel;
         private final Integer currentHouseLevel;
         private final LocalDateTime joinedAt;
+    }  
+ 
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class FarmGetResponse {
+        private Long farmId;
+        private String farmName;
+        private Integer memberCount;
+        private Boolean joined;
+        private LocalDateTime createdAt;
     }
 }
