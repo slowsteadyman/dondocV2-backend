@@ -36,6 +36,10 @@ out/
 ### VS Code ###
 .vscode/
 
+### Claude ###
+.claude
+CLAUDE.md
+src/main/resources/application.yaml
 #IDE 설정 무시
 .idea/
 

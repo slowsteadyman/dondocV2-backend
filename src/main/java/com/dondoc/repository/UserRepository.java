@@ -52,21 +52,20 @@ public class UserRepository {
     }
 
     public Optional<User> findById(Long id) {
-        String sql = "SELECT * FROM users WHERE user_id = ?";
+        String sql = "SELECT * FROM users WHERE id = ?";
         List<User> users = jdbcTemplate.query(sql, (rs, rowNum) -> new User(
-                            rs.getLong("id"),
-                            rs.getString("user_id"),
-                            rs.getString("user_password"),
-                            rs.getString("name"),
-                            rs.getInt("age"),
-                            rs.getInt("current_pig_level"),
-                            rs.getInt("current_house_level"),
-                            rs.getInt("current_character_level"),
-                            rs.getLong("monthly_income"),
-                            rs.getInt("target_expense_ratio"),
-                            rs.getObject("created_at", LocalDateTime.class)
-                    ), id);
-            return users.stream().findFirst();
-
+                rs.getLong("id"),
+                rs.getString("user_id"),
+                rs.getString("user_password"),
+                rs.getString("name"),
+                rs.getInt("age"),
+                rs.getInt("current_pig_level"),
+                rs.getInt("current_house_level"),
+                rs.getInt("current_character_level"),
+                rs.getLong("monthly_income"),
+                rs.getInt("target_expense_ratio"),
+                rs.getObject("created_at", LocalDateTime.class)
+        ), id);
+        return users.stream().findFirst();
     }
 }
