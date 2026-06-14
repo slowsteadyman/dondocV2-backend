@@ -40,6 +40,6 @@ public class RecordSummaryController {
             @RequestParam(value = "month", required = false) String month
     ) {
         MonthlySummaryResponse response = recordSummaryService.getMonthlySummary(userId, month);
-        return ApiResponse.success(response, "월별 요약 통계 조회 성공");
+        return ApiResponse.ok(response, "월별 요약 통계 조회 성공");
     }
 }
