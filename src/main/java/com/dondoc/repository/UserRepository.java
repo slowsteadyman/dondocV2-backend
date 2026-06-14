@@ -52,7 +52,7 @@ public class UserRepository {
     }
 
     public Optional<User> findById(Long id) {
-        String sql = "SELECT * FROM users WHERE user_id = ?";
+        String sql = "SELECT * FROM users WHERE id = ?";
         List<User> users = jdbcTemplate.query(sql, (rs, rowNum) -> new User(
                 rs.getLong("id"),
                 rs.getString("user_id"),
