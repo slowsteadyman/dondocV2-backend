@@ -24,6 +24,9 @@ import java.util.List;
 
 @Service
 public class RecordSummaryService {
+    private static final String INCOME = "INCOME";
+    private static final String EXPENSE = "EXPENSE";
+
     private static final DateTimeFormatter MONTH_FORMATTER = DateTimeFormatter
             .ofPattern("uuuu-MM")
             .withResolverStyle(ResolverStyle.STRICT);
@@ -57,8 +60,8 @@ public class RecordSummaryService {
         Long monthlyBudget = calculateMonthlyBudget(user);
         Long remainBudget = monthlyBudget - totalExpense;
 
-        List<SummaryDetail> incomeDetail = toDetails(categoryAmounts, totalIncome, CategoryType.INCOME);
-        List<SummaryDetail> expenseDetail = toDetails(categoryAmounts, totalExpense, CategoryType.EXPENSE);
+        List<SummaryDetail> incomeDetail = toDetails(categoryAmounts, totalIncome, INCOME);
+        List<SummaryDetail> expenseDetail = toDetails(categoryAmounts, totalExpense, EXPENSE);
 
         return new MonthlySummaryResponse(
                 targetMonth.format(MONTH_FORMATTER),
@@ -111,10 +114,10 @@ public class RecordSummaryService {
     private List<SummaryDetail> toDetails(
             List<CategoryAmountSummary> categoryAmounts,
             Long totalAmount,
-            CategoryType categoryType
+            String type
     ) {
         return categoryAmounts.stream()
-                .filter(categoryAmount -> categoryType.matches(categoryAmount.getCategoryType()))
+                .filter(categoryAmount -> hasType(categoryAmount.getCategoryType(), type))
                 .map(categoryAmount -> new SummaryDetail(
                         new SummaryCategory(categoryAmount.getCategoryId(), categoryAmount.getCategoryName()),
                         categoryAmount.getAmount(),
@@ -151,20 +154,23 @@ public class RecordSummaryService {
         return remainBudget / remainingDays;
     }
 
-    private enum CategoryType {
-        INCOME {
-            @Override
-            boolean matches(String type) {
-                return "INCOME".equalsIgnoreCase(type) || "수입".equals(type);
-            }
-        },
-        EXPENSE {
-            @Override
-            boolean matches(String type) {
-                return "EXPENSE".equalsIgnoreCase(type) || "지출".equals(type);
-            }
-        };
+    private boolean hasType(String actualType, String expectedType) {
+        if (INCOME.equals(expectedType)) {
+            return isIncome(actualType);
+        }
 
-        abstract boolean matches(String type);
+        if (EXPENSE.equals(expectedType)) {
+            return isExpense(actualType);
+        }
+
+        return false;
+    }
+
+    private boolean isIncome(String type) {
+        return INCOME.equalsIgnoreCase(type) || "수입".equals(type);
+    }
+
+    private boolean isExpense(String type) {
+        return EXPENSE.equalsIgnoreCase(type) || "지출".equals(type);
     }
 }
