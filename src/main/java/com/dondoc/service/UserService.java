@@ -27,6 +27,7 @@ public class UserService {
                         entity.getAge(),
                         entity.getCurrentPigLevel(),
                         entity.getCurrentHouseLevel(),
+                        entity.getCurrentCharacterLevel(),
                         entity.getMonthlyIncome(),
                         entity.getTargetExpenseRatio(),
                         entity.getCreatedAt()
@@ -43,6 +44,7 @@ public class UserService {
                 dto.getAge(),
                 dto.getCurrentPigLevel(),
                 dto.getCurrentHouseLevel(),
+                dto.getCurrentCharacterLevel(),
                 dto.getMonthlyIncome(),
                 dto.getTargetExpenseRatio(),
                 dto.getCreatedAt()

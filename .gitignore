@@ -36,6 +36,9 @@ out/
 ### VS Code ###
 .vscode/
 
+### Claude ###
+.claude
+CLAUDE.md
 #IDE 설정 무시
 .idea/
 
