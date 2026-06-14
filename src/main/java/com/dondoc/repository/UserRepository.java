@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class UserRepository {
@@ -27,14 +28,31 @@ public class UserRepository {
                 rs.getInt("age"),
                 rs.getInt("current_pig_level"),
                 rs.getInt("current_house_level"),
+                rs.getInt("current_character_level"),
                 rs.getLong("monthly_income"),
                 rs.getInt("target_expense_ratio"),
                 rs.getObject("created_at", LocalDateTime.class)
         ));
     }
 
+    public Optional<User> findById(long id) {
+        String sql = "SELECT * FROM users WHERE id = ?";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> new User(
+                rs.getLong("id"),
+                rs.getString("user_id"),
+                rs.getString("user_password"),
+                rs.getString("name"),
+                rs.getInt("age"),
+                rs.getInt("current_pig_level"),
+                rs.getInt("current_house_level"),
+                rs.getLong("monthly_income"),
+                rs.getInt("target_expense_ratio"),
+                rs.getObject("created_at", LocalDateTime.class)
+        ), id).stream().findFirst();
+    }
+
     public void save(User user){
-        String sql = "INSERT INTO users (user_id, user_password, name, age, current_pig_level, current_house_level, monthly_income, target_expense_ratio, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO users (user_id, user_password, name, age, current_pig_level, current_house_level, current_character_level,monthly_income, target_expense_ratio, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         jdbcTemplate.update(sql,
                 user.getUserId(),
@@ -43,9 +61,28 @@ public class UserRepository {
                 user.getAge(),
                 user.getCurrentPigLevel(),
                 user.getCurrentHouseLevel(),
+                user.getCurrentCharacterLevel(),
                 user.getMonthlyIncome(),
                 user.getTargetExpenseRatio(),
                 user.getCreatedAt());
     }
 
+    public Optional<User> findById(Long id) {
+        String sql = "SELECT * FROM users WHERE id = ?";
+        List<User> users = jdbcTemplate.query(sql, (rs, rowNum) -> new User(
+                rs.getLong("id"),
+                rs.getString("user_id"),
+                rs.getString("user_password"),
+                rs.getString("name"),
+                rs.getInt("age"),
+                rs.getInt("current_pig_level"),
+                rs.getInt("current_house_level"),
+                rs.getInt("current_character_level"),
+                rs.getLong("monthly_income"),
+                rs.getInt("target_expense_ratio"),
+                rs.getObject("created_at", LocalDateTime.class)
+        ), id);
+        return users.stream().findFirst();
+
+    }
 }

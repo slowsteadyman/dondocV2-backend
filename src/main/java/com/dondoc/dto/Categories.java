@@ -6,6 +6,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 public class Categories {
+    private Long id;
+    private String name;
+    private String icon;
+    private String type;
 
     @Getter
     @Setter
@@ -24,5 +28,13 @@ public class Categories {
         private Long id;
         private String name;
         private String type;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CategoryDto {
+        Long id;
+        String name;
     }
 }
