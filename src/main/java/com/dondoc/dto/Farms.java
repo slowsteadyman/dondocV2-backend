@@ -7,7 +7,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-public class FarmDto {
+public class Farms {
 
     @Getter
     @Setter
