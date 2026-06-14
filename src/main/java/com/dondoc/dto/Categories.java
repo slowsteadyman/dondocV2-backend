@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-public class CategoryDto {
+public class Categories {
 
     @Getter
     @Setter

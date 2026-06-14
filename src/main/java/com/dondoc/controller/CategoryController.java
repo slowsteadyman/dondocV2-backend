@@ -1,7 +1,7 @@
 package com.dondoc.controller;
 
 import com.dondoc.dto.ApiResponse;
-import com.dondoc.dto.CategoryDto;
+import com.dondoc.dto.Categories;
 import com.dondoc.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,10 +19,10 @@ public class CategoryController {
 
     private final CategoryService categoryService;
     @GetMapping
-    public ResponseEntity<ApiResponse<List<CategoryDto.Response>>> getCategories(
+    public ResponseEntity<ApiResponse<List<Categories.Response>>> getCategories(
             @RequestHeader(value = "userId", required = false) Long userId
     ) {
-        List<CategoryDto.Response> categories = categoryService.getCategories(userId);
+        List<Categories.Response> categories = categoryService.getCategories(userId);
         return ResponseEntity.ok(ApiResponse.ok(categories, "카테고리 조회 성공"));
     }
 }

@@ -1,6 +1,6 @@
 package com.dondoc.controller;
 
-import com.dondoc.dto.CategoryDto;
+import com.dondoc.dto.Categories;
 import com.dondoc.dto.MonthlyHistories;
 import com.dondoc.dto.Records;
 import com.dondoc.service.RecordService;
@@ -24,7 +24,7 @@ public class RecordController {
     }
 
     @GetMapping("/categories")
-    public List<CategoryDto.Category> getCategories() {
+    public List<Categories.Category> getCategories() {
         return recordService.getCategories();
     }
 
@@ -39,7 +39,7 @@ public class RecordController {
     }
 
     @PostMapping("/categories")
-    public void createCategory(@RequestBody CategoryDto.Category category){
+    public void createCategory(@RequestBody Categories.Category category){
         recordService.createCategory(category);
     }
 
