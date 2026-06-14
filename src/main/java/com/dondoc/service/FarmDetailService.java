@@ -1,7 +1,7 @@
 package com.dondoc.service;
 
-import com.dondoc.dto.farm.FarmDetailMemberResponse;
-import com.dondoc.dto.farm.FarmDetailResponse;
+import com.dondoc.dto.Farms.FarmDetailMemberResponse;
+import com.dondoc.dto.Farms.FarmDetailResponse;
 import com.dondoc.entity.Farm;
 import com.dondoc.exception.ApiException;
 import com.dondoc.repository.FarmMemberRepository;

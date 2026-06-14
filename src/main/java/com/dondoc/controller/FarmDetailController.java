@@ -1,7 +1,7 @@
 package com.dondoc.controller;
 
 import com.dondoc.dto.ApiResponse;
-import com.dondoc.dto.farm.FarmDetailResponse;
+import com.dondoc.dto.Farms.FarmDetailResponse;
 import com.dondoc.service.FarmDetailService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
