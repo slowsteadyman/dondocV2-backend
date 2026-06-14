@@ -80,7 +80,6 @@ public class UserRepository {
         jdbcTemplate.update(sql, id);
     }
 
-    // 현 API에서 사용하진 않지만 컬럼 추가 고려
     public Optional<User> findById(Long id) {
         String sql = "SELECT * FROM users WHERE id = ?";
         List<User> users = jdbcTemplate.query(sql, (rs, rowNum) -> new User(
