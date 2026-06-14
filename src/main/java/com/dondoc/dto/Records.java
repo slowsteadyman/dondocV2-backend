@@ -3,15 +3,9 @@ package com.dondoc.dto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class Records {
     private Long id;
     private Long userId;
@@ -30,10 +24,8 @@ public class Records {
         private long categoryId;
         private String date;
         private long amount;
-        private String description;
-        private String memo;
     }
-
+  
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
@@ -43,6 +35,38 @@ public class Records {
         private String date;
         private Categories.CategoryInfo category;
         private long amount;
+    }
+  
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DailySummaryResponse {
+        private LocalDate date;
+        private long income;
+        private long expense;
+        private int pigLevel;
+    }
+    
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class RecordSaveRequest {
+        private String type;
+        private Long categoryId;
+        private LocalDate date;
+        private Long amount;
+        private String description;
+        private String memo;
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class RecordSaveResponse {
+        private Long id;
+        private String type;
+        private Categories.CategoryDto category;
+        private LocalDate date;
+        private Long amount;
         private String description;
         private String memo;
     }

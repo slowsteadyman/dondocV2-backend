@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class CategoryRepository {
@@ -14,7 +15,7 @@ public class CategoryRepository {
     public CategoryRepository(JdbcTemplate jdbcTemplate) {this.jdbcTemplate = jdbcTemplate;}
 
     public List<Category> findAll(){
-        String sql = "SELECT * FROM categories";
+        String sql = "SELECT * FROM categories ORDER BY id";
         return jdbcTemplate.query(sql, (rs,rowNum) -> new Category(
                 rs.getLong("id"),
                 rs.getString("name"),
@@ -28,14 +29,13 @@ public class CategoryRepository {
         jdbcTemplate.update(sql, category.getName(), category.getIcon(), category.getType());
     }
 
-    public Category findById(long id) {
+    public Optional<Category> findById(Long id) {
         String sql = "SELECT * FROM categories WHERE id = ?";
-
-        return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> new Category(
-            rs.getLong("id"),
-            rs.getString("name"),
-            rs.getString("icon"),
-            rs.getString("type")
-        ), id);
+        return jdbcTemplate.query(sql, (rs, rowNum) -> new Category(
+                rs.getLong("id"),
+                rs.getString("name"),
+                rs.getString("icon"),
+                rs.getString("type")
+        ), id).stream().findFirst();
     }
 }

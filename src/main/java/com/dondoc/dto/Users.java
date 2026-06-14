@@ -19,6 +19,7 @@ public class Users {
     private Integer age;
     private Integer currentPigLevel;
     private Integer currentHouseLevel;
+    private Integer currentCharacterLevel;
     private Long monthlyIncome;
     private Integer targetExpenseRatio;
     private LocalDateTime createdAt;
