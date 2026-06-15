@@ -11,7 +11,6 @@ import com.dondoc.repository.projection.FarmMemberDetail;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -33,8 +32,8 @@ public class FarmDetailService {
     }
 
     @Transactional(readOnly = true)
-    public FarmDetailResponse getFarmDetail(String userIdHeader, Long farmId) {
-        Long userId = parseUserId(userIdHeader);
+    public FarmDetailResponse getFarmDetail(Long userId, Long farmId) {
+        if (userId == null) throw new ApiException(HttpStatus.UNAUTHORIZED, "인증 토큰 없음");
         Farm farm = farmRepository.findById(farmId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "존재하지 않는 농장"));
 
@@ -65,20 +64,4 @@ public class FarmDetailService {
         );
     }
 
-    private Long parseUserId(String userIdHeader) {
-        if (!StringUtils.hasText(userIdHeader)) {
-            throw new ApiException(HttpStatus.UNAUTHORIZED, "인증 토큰 없음");
-        }
-
-        try {
-            Long userId = Long.parseLong(userIdHeader);
-            if (userId <= 0) {
-                throw new NumberFormatException("userId must be positive");
-            }
-
-            return userId;
-        } catch (NumberFormatException exception) {
-            throw new ApiException(HttpStatus.UNAUTHORIZED, "인증 토큰 없음");
-        }
-    }
 }

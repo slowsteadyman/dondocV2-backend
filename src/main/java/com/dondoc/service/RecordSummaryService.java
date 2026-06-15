@@ -42,8 +42,8 @@ public class RecordSummaryService {
     }
 
     @Transactional(readOnly = true)
-    public MonthlySummaryResponse getMonthlySummary(String userIdHeader, String month) {
-        Long userId = parseUserId(userIdHeader);
+    public MonthlySummaryResponse getMonthlySummary(Long userId, String month) {
+        if (userId == null) throw new ApiException(HttpStatus.UNAUTHORIZED, "인증되지 않은 사용자");
         YearMonth targetMonth = parseMonth(month);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "인증되지 않은 사용자"));
@@ -78,18 +78,6 @@ public class RecordSummaryService {
                 incomeDetail,
                 expenseDetail
         );
-    }
-
-    private Long parseUserId(String userIdHeader) {
-        if (!StringUtils.hasText(userIdHeader)) {
-            throw new ApiException(HttpStatus.UNAUTHORIZED, "인증되지 않은 사용자");
-        }
-
-        try {
-            return Long.parseLong(userIdHeader);
-        } catch (NumberFormatException exception) {
-            throw new ApiException(HttpStatus.UNAUTHORIZED, "인증되지 않은 사용자");
-        }
     }
 
     private YearMonth parseMonth(String month) {

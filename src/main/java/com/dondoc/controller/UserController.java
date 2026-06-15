@@ -23,16 +23,11 @@ public class UserController {
         return userService.getUsers();
     }
 
-    @PostMapping
-    public void createUser(@RequestBody Users.CreateRequest user){
-        userService.createUser(user);
-    }
-
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<Users.MeResponse>> getUserMe(
             @RequestHeader(value = "userId", required = false) Long userId) {
         Users.MeResponse response = userService.getUserMe(userId);
-        return ResponseEntity.ok(ApiResponse.ok(response, "월별 요약 통계 조회 성공"));
+        return ResponseEntity.ok(ApiResponse.ok(response, "내 정보 조회 성공"));
     }
 
     @PatchMapping("/me")

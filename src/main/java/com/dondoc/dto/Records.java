@@ -48,12 +48,12 @@ public class Records {
     @AllArgsConstructor
     public static class MonthlySettlementResponse {
         private final String month;
-        private final Long totalIncome;
-        private final Long totalExpense;
+        private final Long monthIncome;
+        private final Long monthExpense;
         private final Long netIncome;
         private final Long monthlyBudget;
-        private final Integer budgetUsedPercent;
-        private final Integer avgPigState;
+        private final Integer avgExpenseRatio;
+        private final Integer avgPigLevel;
         private final Integer currentHouseLevel;
         private final Integer nextHouseLevel;
         private final List<SettlementCategoryExpense> categoryExpenses;
@@ -107,6 +107,7 @@ public class Records {
         private final String name;
     }
 
+    @Getter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class RecordUpdateRequest {
@@ -114,6 +115,8 @@ public class Records {
         private long categoryId;
         private String date;
         private long amount;
+        private String description;
+        private String memo;
     }
 
     @Getter
@@ -125,6 +128,8 @@ public class Records {
         private String date;
         private Categories.CategoryInfo category;
         private long amount;
+        private String description;
+        private String memo;
     }
 
     @Getter
@@ -149,6 +154,7 @@ public class Records {
         private String memo;
     }
 
+    @Getter
     @AllArgsConstructor
     @NoArgsConstructor
     public static class RecordSaveResponse {

@@ -44,6 +44,7 @@ public class Farms {
         private final LocalDateTime joinedAt;
     }
 
+    @Getter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class FarmGetResponse {

@@ -22,7 +22,7 @@ public class FarmDetailController {
     @GetMapping("/{farmId}")
     public ApiResponse<FarmDetailResponse> getFarmDetail(
             @PathVariable Long farmId,
-            @RequestHeader(value = "userId", required = false) String userId
+            @RequestHeader(value = "userId", required = false) Long userId
     ) {
         return ApiResponse.ok(farmDetailService.getFarmDetail(userId, farmId), "농장 상세 조회 성공");
     }

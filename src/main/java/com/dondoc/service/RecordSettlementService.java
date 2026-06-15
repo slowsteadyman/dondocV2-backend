@@ -45,8 +45,8 @@ public class RecordSettlementService {
     }
 
     @Transactional(readOnly = true)
-    public MonthlySettlementResponse getMonthlySettlement(String userIdHeader, String month) {
-        Long userId = parseUserId(userIdHeader);
+    public MonthlySettlementResponse getMonthlySettlement(Long userId, String month) {
+        if (userId == null) throw new ApiException(HttpStatus.UNAUTHORIZED, "인증되지 않은 사용자");
         YearMonth targetMonth = parseMonth(month);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "인증되지 않은 사용자"));
@@ -83,18 +83,6 @@ public class RecordSettlementService {
                         .orElseGet(() -> calculateNextHouseLevel(currentHouseLevel, budgetUsedPercent)),
                 toCategoryExpenses(expenseCategories, totalExpense)
         );
-    }
-
-    private Long parseUserId(String userIdHeader) {
-        if (!StringUtils.hasText(userIdHeader)) {
-            throw new ApiException(HttpStatus.UNAUTHORIZED, "인증되지 않은 사용자");
-        }
-
-        try {
-            return Long.parseLong(userIdHeader);
-        } catch (NumberFormatException exception) {
-            throw new ApiException(HttpStatus.UNAUTHORIZED, "인증되지 않은 사용자");
-        }
     }
 
     private YearMonth parseMonth(String month) {

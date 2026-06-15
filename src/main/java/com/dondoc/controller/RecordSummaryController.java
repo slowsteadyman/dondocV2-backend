@@ -21,7 +21,7 @@ public class RecordSummaryController {
 
     @GetMapping("/summary")
     public ApiResponse<MonthlySummaryResponse> getMonthlySummary(
-            @RequestHeader(value = "userId", required = false) String userId,
+            @RequestHeader(value = "userId", required = false) Long userId,
             @RequestParam(value = "month", required = false) String month
     ) {
         MonthlySummaryResponse response = recordSummaryService.getMonthlySummary(userId, month);

@@ -1,6 +1,7 @@
 package com.dondoc.service;
 
 import com.dondoc.dto.*;
+
 import com.dondoc.entity.User;
 import com.dondoc.exception.ApiException;
 import com.dondoc.repository.UserRepository;
@@ -17,6 +18,22 @@ public class UserService {
 
     public UserService(UserRepository userRepository){
         this.userRepository = userRepository;
+    }
+
+    public List<Users.UserResponse> getUsers() {
+        return userRepository.findAll().stream()
+                .map(user -> new Users.UserResponse(
+                        user.getId(),
+                        user.getUserId(),
+                        user.getName(),
+                        user.getAge(),
+                        user.getCurrentPigLevel(),
+                        user.getCurrentHouseLevel(),
+                        user.getMonthlyIncome(),
+                        user.getTargetExpenseRatio(),
+                        user.getCreatedAt()
+                ))
+                .collect(Collectors.toList());
     }
 
     public Users.MeResponse getUserMe(Long userId){

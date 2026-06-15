@@ -18,6 +18,7 @@ public class Categories {
         private String name;
     }
 
+    @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor

@@ -1,7 +1,6 @@
 package com.dondoc.service;
 
 import com.dondoc.dto.Categories;
-import com.dondoc.dto.MonthlyHistories;
 import com.dondoc.dto.Records;
 import com.dondoc.dto.Records.RecordUpdateRequest;
 import com.dondoc.dto.Records.RecordUpdateResponse;
@@ -28,10 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class RecordService {
@@ -166,7 +161,8 @@ public class RecordService {
 
         Recorde updated = recordRepository.findById(id)
                 .orElseThrow(() -> new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "거래 수정 후 조회에 실패했습니다."));
-        Category category = categoryRepository.findById(updated.getCategoryId());
+        Category category = categoryRepository.findById(updated.getCategoryId())
+                .orElseThrow(() -> new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "카테고리 조회에 실패했습니다."));
 
         return new RecordUpdateResponse(
             updated.getId(),

@@ -19,9 +19,9 @@ public class RecordSettlementController {
         this.recordSettlementService = recordSettlementService;
     }
 
-    @GetMapping("/settlement")
+    @GetMapping("/closing")
     public ApiResponse<MonthlySettlementResponse> getMonthlySettlement(
-            @RequestHeader(value = "userId", required = false) String userId,
+            @RequestHeader(value = "userId", required = false) Long userId,
             @RequestParam(value = "month", required = false) String month
     ) {
         MonthlySettlementResponse response = recordSettlementService.getMonthlySettlement(userId, month);
