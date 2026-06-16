@@ -6,16 +6,22 @@ import com.dondoc.dto.auth.SignUpRequest;
 import com.dondoc.entity.User;
 import com.dondoc.exception.ApiException;
 import com.dondoc.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AuthService {
-    private final UserRepository userRepository;
+    @Value("${app.default-farm-id}")
+    private Long defaultFarmId;
 
-    public AuthService(UserRepository userRepository){
+    private final UserRepository userRepository;
+    private final FarmService farmService;
+
+    public AuthService(UserRepository userRepository, FarmService farmService){
         this.userRepository = userRepository;
+        this.farmService = farmService;
     }
 
     @Transactional
@@ -42,7 +48,9 @@ public class AuthService {
     @Transactional
     public Long createUser(SignUpRequest request){
         if(userRepository.findByUserId(request.getUserId()).isEmpty()) {
-            return userRepository.save(request);
+            Long userId = userRepository.save(request);
+            farmService.addFarmMember(userId, defaultFarmId);
+            return userId;
         } else {
             throw new ApiException(HttpStatus.CONFLICT, "이미 사용 중인 아이디입니다.");
         }
