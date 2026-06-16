@@ -31,7 +31,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.time.Clock;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
@@ -58,19 +57,15 @@ public class RecordService {
     private final MonthlyHistoryRepository monthlyHistoryRepository;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
-    private final Clock clock;
-
     public RecordService(
             RecordRepository recordRepository,
             MonthlyHistoryRepository monthlyHistoryRepository,
             CategoryRepository categoryRepository,
-            UserRepository userRepository,
-            Clock clock) {
+            UserRepository userRepository) {
         this.recordRepository = recordRepository;
         this.monthlyHistoryRepository = monthlyHistoryRepository;
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
-        this.clock = clock;
     }
 
     // ── 거래 CRUD ──────────────────────────────────────────────────────────────
@@ -332,7 +327,7 @@ public class RecordService {
     }
 
     private Long calculateRecommendDailyBudget(YearMonth targetMonth, Long remainBudget) {
-        LocalDate today = LocalDate.now(clock);
+        LocalDate today = LocalDate.now();
         YearMonth currentMonth = YearMonth.from(today);
         int remainingDays;
         if (targetMonth.isBefore(currentMonth)) {
