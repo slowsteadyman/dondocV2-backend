@@ -232,7 +232,7 @@ public class RecordService {
 
         MonthlyRecordAmountSummary amountSummary = recordRepository.findMonthlyAmountSummary(userId, startDate, endDate);
         List<ExpenseCategorySummary> expenseCategories = recordRepository.findMonthlyExpenseCategories(userId, startDate, endDate);
-        Optional<MonthlySettlementHistory> settlementHistory = monthlyHistoryRepository.findSettlementHistory(
+        Optional<MonthlySettlementHistory> settlementHistory = monthlyHistoryRepository.findByUserIdAndTargetMonth(
                 userId, targetMonth.format(MONTH_FORMATTER));
 
         Long totalIncome = amountSummary.getTotalIncome();

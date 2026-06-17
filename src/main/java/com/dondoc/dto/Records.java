@@ -174,7 +174,7 @@ public class Records {
     public static class MonthlyHistory {
         private Long id;
         private Long userId;
-        private LocalDate targetMonth;
+        private String targetMonth;
         private Float avgRatio;
         private Integer houseLevel;
     }

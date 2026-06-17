@@ -27,7 +27,7 @@ public class MonthlyHistory {
     private Long userId;
 
     @Column(name = "target_month")
-    private LocalDate targetMonth;
+    private String targetMonth;
 
     @Column(name = "avg_ratio")
     private Float avgRatio;
