@@ -31,7 +31,7 @@ public class AuthService {
         if(user == null || !user.getUserPassword().equals(request.getUserPassword())) {
             throw new ApiException(HttpStatus.CONFLICT, "아이디나 비밀번호가 일치하지 않습니다.");
         } else  {
-            userRepository.updateLastLoginAt(user.getId());
+            user.updateLastLoginTime();
             return new LoginResponse(
                     user.getId(),
                     user.getName(),
@@ -48,9 +48,24 @@ public class AuthService {
     @Transactional
     public Long createUser(SignUpRequest request){
         if(userRepository.findByUserId(request.getUserId()).isEmpty()) {
-            Long userId = userRepository.save(request);
-            farmService.addFarmMember(userId, defaultFarmId);
-            return userId;
+            User newUser = new User(
+                    null,
+                    request.getUserId(),
+                    request.getUserPassword(),
+                    request.getName(),
+                    0,
+                    5,
+                    3,
+                    3,
+                    0L,
+                    0,
+                    null,
+                    null
+            );
+
+            User savedUser = userRepository.save(newUser);
+            farmService.addFarmMember(savedUser.getId(), defaultFarmId);
+            return savedUser.getId();
         } else {
             throw new ApiException(HttpStatus.CONFLICT, "이미 사용 중인 아이디입니다.");
         }
