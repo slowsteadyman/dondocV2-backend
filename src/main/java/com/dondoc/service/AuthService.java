@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 public class AuthService {
     @Value("${app.default-farm-id}")
@@ -59,7 +61,7 @@ public class AuthService {
                     3,
                     0L,
                     0,
-                    null,
+                    LocalDateTime.now(),
                     null
             );
 
