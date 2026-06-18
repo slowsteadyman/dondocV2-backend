@@ -94,7 +94,7 @@ public interface RecordRepository extends JpaRepository<Recorde, Long> {
         );
     }*/
 
-    public Long save(Long userId, Records.RecordSaveRequest saveRequest) {
+    /*public Long save(Long userId, Records.RecordSaveRequest saveRequest) {
         String sql = "INSERT INTO records (user_id, category_id, amount, description, memo, record_date) VALUES (?, ?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(con -> {
@@ -109,7 +109,7 @@ public interface RecordRepository extends JpaRepository<Recorde, Long> {
             return pstmt;
         }, keyHolder);
         return Objects.requireNonNull(keyHolder.getKey()).longValue();
-    }
+    }*/
 
 
     public Optional<Recorde> findById(Long id) {
