@@ -7,13 +7,12 @@ import com.dondoc.repository.projection.ExpenseCategorySummary;
 import com.dondoc.repository.projection.MonthlyRecordAmountSummary;
 import com.dondoc.repository.projection.CategoryAmountSummary;
 import com.dondoc.repository.projection.MonthlyRecordTotal;
-import org.springframework.cglib.core.Local;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -24,29 +23,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-@Repository
-public class RecordRepository {
-
-    private final JdbcTemplate jdbcTemplate;
-    private final RowMapper<Recorde> recordRowMapper = (rs, rowNum) -> new Recorde(
-            rs.getLong("id"),
-            rs.getLong("user_id"),
-            rs.getLong("category_id"),
-            rs.getLong("amount"),
-            rs.getString("description"),
-            rs.getString("memo"),
-            rs.getObject("record_date", LocalDate.class),
-            rs.getObject("created_at", LocalDateTime.class)
-    );
-
-    public RecordRepository(JdbcTemplate jdbcTemplate){
-        this.jdbcTemplate = jdbcTemplate;
-    }
-
-    public List<Recorde> findAll(){
-        String sql = "SELECT * FROM records";
-        return jdbcTemplate.query(sql, recordRowMapper);
-    }
+public interface RecordRepository extends JpaRepository<Recorde, Long> {
 
     public MonthlyRecordTotal findMonthlyTotal(Long userId, LocalDate startDate, LocalDate endDate) {
         String sql = """
@@ -98,7 +75,8 @@ public class RecordRepository {
         ), userId, startDate, endDate);
     }
 
-    public List<Recorde> findByDateRange(long userId, LocalDate start, LocalDate end) {
+    List<Recorde> findByUserIdAndRecordDateBetween(Long userId, LocalDate start, LocalDate end);
+    /*public List<Recorde> findByDateRange(long userId, LocalDate start, LocalDate end) {
         String sql = "SELECT * FROM records WHERE user_id = ? AND record_date BETWEEN ? AND ?";
 
         return jdbcTemplate.query(sql,
@@ -114,7 +92,7 @@ public class RecordRepository {
             ),
             userId, start, end
         );
-    }
+    }*/
 
     public Long save(Long userId, Records.RecordSaveRequest saveRequest) {
         String sql = "INSERT INTO records (user_id, category_id, amount, description, memo, record_date) VALUES (?, ?, ?, ?, ?, ?)";

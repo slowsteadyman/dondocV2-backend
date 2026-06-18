@@ -162,7 +162,7 @@ public class RecordService {
         LocalDate start = yearMonth.atDay(1);
         LocalDate end = yearMonth.atEndOfMonth();
 
-        List<Recorde> records = recordRepository.findByDateRange(userId, start, end);
+        List<Recorde> records = recordRepository.findByUserIdAndRecordDateBetween(userId, start, end);
         Map<Long, String> categoryTypeMap = categoryRepository.findAll().stream()
                 .collect(Collectors.toMap(Category::getId, Category::getType));
 
