@@ -8,6 +8,8 @@ import com.dondoc.repository.projection.MonthlyRecordAmountSummary;
 import com.dondoc.repository.projection.CategoryAmountSummary;
 import com.dondoc.repository.projection.MonthlyRecordTotal;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -22,34 +24,29 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-
 public interface RecordRepository extends JpaRepository<Recorde, Long> {
 
-    public MonthlyRecordTotal findMonthlyTotal(Long userId, LocalDate startDate, LocalDate endDate) {
-        String sql = """
-                SELECT
-                    COALESCE(SUM(CASE
-                        WHEN UPPER(c.type) = 'INCOME' OR c.type = '수입' THEN r.amount
-                        ELSE 0
-                    END), 0) AS total_income,
-                    COALESCE(SUM(CASE
-                        WHEN UPPER(c.type) = 'EXPENSE' OR c.type = '지출' THEN r.amount
-                        ELSE 0
-                    END), 0) AS total_expense,
-                    COUNT(r.id) AS transaction_count
-                FROM records r
-                LEFT JOIN categories c ON r.category_id = c.id
-                WHERE r.user_id = ?
-                  AND r.record_date >= ?
-                  AND r.record_date < ?
-                """;
-
-        return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> new MonthlyRecordTotal(
-                rs.getLong("total_income"),
-                rs.getLong("total_expense"),
-                rs.getInt("transaction_count")
-        ), userId, startDate, endDate);
-    }
+    @Query("""
+        SELECT
+            COALESCE(SUM(CASE
+                WHEN UPPER(c.type) = 'INCOME' OR c.type = '수입' THEN r.amount
+                ELSE 0
+            END), 0) AS totalIncome,
+            COALESCE(SUM(CASE
+                WHEN UPPER(c.type) = 'EXPENSE' OR c.type = '지출' THEN r.amount
+                ELSE 0
+            END), 0) AS totalExpense,
+            COUNT(r.id) AS transactionCount
+        FROM Recorde r
+        LEFT JOIN Category c ON r.categoryId = c.id
+        WHERE r.userId = :userId
+          AND r.recordDate >= :startDate
+          AND r.recordDate < :endDate
+    """)
+    MonthlyRecordTotal findMonthlyTotal(
+        @Param("userId") Long userId,
+        @Param("startDate") LocalDate startDate,
+        @Param("endDate") LocalDate endDate);
 
     public List<CategoryAmountSummary> findMonthlyCategoryAmounts(Long userId, LocalDate startDate, LocalDate endDate) {
         String sql = """
