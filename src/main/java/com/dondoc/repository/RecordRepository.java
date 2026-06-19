@@ -111,21 +111,6 @@ public interface RecordRepository extends JpaRepository<Recorde, Long> {
         return Objects.requireNonNull(keyHolder.getKey()).longValue();
     }*/
 
-
-    public Optional<Recorde> findById(Long id) {
-        String sql = "SELECT * FROM records WHERE id = ?";
-        return jdbcTemplate.query(sql,(rs, rowNum) -> new Recorde(
-                rs.getLong("id"),
-                rs.getLong("user_id"),
-                rs.getLong("category_id"),
-                rs.getLong("amount"),
-                rs.getString("description"),
-                rs.getString("memo"),
-                rs.getObject("record_date", LocalDate.class),
-                rs.getObject("created_at", LocalDateTime.class)
-        ), id).stream().findFirst();
-    }
-
     public int update(Recorde recorde) {
         String sql = "UPDATE records SET category_id = ?, amount = ?, description = ?, memo = ?, record_date = ? WHERE id = ?";
         return jdbcTemplate.update(sql,
