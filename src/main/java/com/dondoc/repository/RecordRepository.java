@@ -111,18 +111,6 @@ public interface RecordRepository extends JpaRepository<Recorde, Long> {
         return Objects.requireNonNull(keyHolder.getKey()).longValue();
     }*/
 
-    public int update(Recorde recorde) {
-        String sql = "UPDATE records SET category_id = ?, amount = ?, description = ?, memo = ?, record_date = ? WHERE id = ?";
-        return jdbcTemplate.update(sql,
-            recorde.getCategoryId(),
-            recorde.getAmount(),
-            recorde.getDescription(),
-            recorde.getMemo(),
-            recorde.getRecordDate(),
-            recorde.getId()
-        );
-    }
-
     public MonthlyRecordAmountSummary findMonthlyAmountSummary(Long userId, LocalDate startDate, LocalDate endDate) {
         String sql = """
                 SELECT

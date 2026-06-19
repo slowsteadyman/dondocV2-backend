@@ -133,10 +133,8 @@ public class RecordService {
                 id, existing.getUserId(), dto.getCategoryId(), dto.getAmount(),
                 dto.getDescription(), dto.getMemo(), LocalDate.parse(dto.getDate()), existing.getCreatedAt()
         );
-        recordRepository.update(recorde);
 
-        Recorde updated = recordRepository.findById(id)
-                .orElseThrow(() -> new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "거래 수정 후 조회에 실패했습니다."));
+        Recorde updated = recordRepository.save(recorde);
         Category category = categoryRepository.findById(updated.getCategoryId())
                 .orElseThrow(() -> new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "카테고리 조회에 실패했습니다."));
 
