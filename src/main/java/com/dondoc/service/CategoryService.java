@@ -22,7 +22,7 @@ public class CategoryService {
             throw new ApiException(HttpStatus.UNAUTHORIZED, "인증 토큰 없음");
         }
 
-        List<Category> entities = categoryRepository.findAll();
+        List<Category> entities = categoryRepository.findAllByOrderByIdAsc();
         return entities.stream()
                 .map(entity -> new Categories.Response(
                         entity.getId(),
