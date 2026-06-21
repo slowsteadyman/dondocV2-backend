@@ -6,6 +6,7 @@ import com.dondoc.dto.Records;
 import com.dondoc.dto.Records.DailySummaryResponse;
 import com.dondoc.dto.Records.MonthlySummaryResponse;
 import com.dondoc.dto.Records.MonthlySettlementResponse;
+import com.dondoc.dto.Records.RecordSaveRequest;
 import com.dondoc.dto.Records.RecordUpdateRequest;
 import com.dondoc.dto.Records.RecordUpdateResponse;
 import com.dondoc.dto.Records.SettlementCategory;
@@ -26,6 +27,7 @@ import com.dondoc.repository.projection.ExpenseCategorySummary;
 import com.dondoc.repository.projection.MonthlyRecordAmountSummary;
 import com.dondoc.repository.projection.MonthlyRecordTotal;
 import com.dondoc.repository.projection.MonthlySettlementHistory;
+import java.util.Date;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,20 +77,28 @@ public class RecordService {
         userRepository.findById(userId)
                 .orElseThrow(() -> new ApiException(HttpStatus.CONFLICT, "존재하지 않는 사용자"));
 
-        Long savedId = recordRepository.save(userId, saveRequest);
-        Recorde recorde = recordRepository.findById(savedId)
-                .orElseThrow(() -> new ApiException(HttpStatus.CONFLICT, "거래 추가 중 에러 발생"));
-        Category category = categoryRepository.findById(recorde.getCategoryId())
+        Recorde newRecord = Recorde.builder()
+            .userId(userId)
+            .categoryId(saveRequest.getCategoryId())
+            .amount(saveRequest.getAmount())
+            .description(saveRequest.getDescription())
+            .memo(saveRequest.getMemo())
+            .recordDate(saveRequest.getDate())
+            .build();
+
+        Recorde saved = recordRepository.save(newRecord);
+
+        Category category = categoryRepository.findById(saved.getCategoryId())
                 .orElseThrow(() -> new ApiException(HttpStatus.CONFLICT, "카테고리 조회 중 오류 발생"));
 
         return new Records.RecordSaveResponse(
-                recorde.getId(),
+                saved.getId(),
                 category.getType(),
                 new Categories.CategoryDto(category.getId(), category.getName()),
-                recorde.getRecordDate(),
-                recorde.getAmount(),
-                recorde.getDescription(),
-                recorde.getMemo()
+                saved.getRecordDate(),
+                saved.getAmount(),
+                saved.getDescription(),
+                saved.getMemo()
         );
     }
 
@@ -123,10 +133,8 @@ public class RecordService {
                 id, existing.getUserId(), dto.getCategoryId(), dto.getAmount(),
                 dto.getDescription(), dto.getMemo(), LocalDate.parse(dto.getDate()), existing.getCreatedAt()
         );
-        recordRepository.update(recorde);
 
-        Recorde updated = recordRepository.findById(id)
-                .orElseThrow(() -> new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "거래 수정 후 조회에 실패했습니다."));
+        Recorde updated = recordRepository.save(recorde);
         Category category = categoryRepository.findById(updated.getCategoryId())
                 .orElseThrow(() -> new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "카테고리 조회에 실패했습니다."));
 
@@ -162,7 +170,7 @@ public class RecordService {
         LocalDate start = yearMonth.atDay(1);
         LocalDate end = yearMonth.atEndOfMonth();
 
-        List<Recorde> records = recordRepository.findByDateRange(userId, start, end);
+        List<Recorde> records = recordRepository.findByUserIdAndRecordDateBetween(userId, start, end);
         Map<Long, String> categoryTypeMap = categoryRepository.findAll().stream()
                 .collect(Collectors.toMap(Category::getId, Category::getType));
 
@@ -232,7 +240,7 @@ public class RecordService {
 
         MonthlyRecordAmountSummary amountSummary = recordRepository.findMonthlyAmountSummary(userId, startDate, endDate);
         List<ExpenseCategorySummary> expenseCategories = recordRepository.findMonthlyExpenseCategories(userId, startDate, endDate);
-        Optional<MonthlySettlementHistory> settlementHistory = monthlyHistoryRepository.findSettlementHistory(
+        Optional<MonthlySettlementHistory> settlementHistory = monthlyHistoryRepository.findByUserIdAndTargetMonth(
                 userId, targetMonth.format(MONTH_FORMATTER));
 
         Long totalIncome = amountSummary.getTotalIncome();

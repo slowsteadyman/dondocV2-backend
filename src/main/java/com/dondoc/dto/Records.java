@@ -1,6 +1,7 @@
 package com.dondoc.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -174,7 +175,7 @@ public class Records {
     public static class MonthlyHistory {
         private Long id;
         private Long userId;
-        private LocalDate targetMonth;
+        private String targetMonth;
         private Float avgRatio;
         private Integer houseLevel;
     }
