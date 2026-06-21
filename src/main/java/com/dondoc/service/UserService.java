@@ -1,12 +1,13 @@
 package com.dondoc.service;
 
-import com.dondoc.dto.*;
-
+import com.dondoc.dto.ApiResponse;
+import com.dondoc.dto.Users;
 import com.dondoc.entity.User;
 import com.dondoc.exception.ApiException;
 import com.dondoc.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -62,6 +63,7 @@ public class UserService {
         );
     }
 
+    @Transactional
     public ApiResponse<Users.PatchResponse> updateUserMe(Long userId, Users.PatchRequest request){
         if (userId == null) {
             throw new ApiException(
@@ -73,26 +75,28 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
 
-        userRepository.update(userId, request, user);
+        if(!request.getName().isEmpty()) {
+            user.setName(request.getName());
+        }
+        if(request.getAge() != 0) {
+            user.setAge(request.getAge());
+        }
+        if(request.getMonthlyIncome() != 0) {
+            user.setMonthlyIncome(request.getMonthlyIncome());
+        }
+        if(request.getTargetExpenseRatio() != 0) {
+            user.setTargetExpenseRatio(request.getTargetExpenseRatio());
+        }
 
-        String updatedName = request.getName() != null ? request.getName() : user.getName();
-        Integer updatedAge = request.getAge() != null ? request.getAge() : user.getAge();
-        Long updatedMonthlyIncome = request.getMonthlyIncome() != null
-                ? request.getMonthlyIncome()
-                : user.getMonthlyIncome();
-        Integer updatedTargetExpenseRatio = request.getTargetExpenseRatio() != null
-                ? request.getTargetExpenseRatio()
-                : user.getTargetExpenseRatio();
-
-        long monthlyBudget = updatedMonthlyIncome * updatedTargetExpenseRatio / 100;
+        long monthlyBudget = user.getMonthlyIncome() * user.getTargetExpenseRatio() / 100;
         long dailyBudget = monthlyBudget / LocalDate.now().lengthOfMonth();
 
         Users.PatchResponse data = new Users.PatchResponse(
                 user.getId(),
-                updatedName,
-                updatedAge,
-                updatedMonthlyIncome,
-                updatedTargetExpenseRatio,
+                user.getName(),
+                user.getAge(),
+                user.getMonthlyIncome(),
+                user.getTargetExpenseRatio(),
                 monthlyBudget,
                 dailyBudget
         );

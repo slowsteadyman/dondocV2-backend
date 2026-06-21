@@ -121,7 +121,8 @@ public class FarmService {
 
         LocalDateTime createdAt = LocalDateTime.now();
         Farm farm = new Farm(null, farmName, createdAt);
-        Long farmId = farmRepository.saveAndReturnId(farm);
+        Farm saveFarm=farmRepository.save(farm);
+        Long farmId = saveFarm.getId();
 
         FarmMember farmMember = new FarmMember(null, userId, farmId, createdAt);
         farmMemberRepository.save(farmMember);
